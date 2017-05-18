@@ -1,0 +1,276 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ACTION_H	action.h	6;"	d
+ADC1_I2C_ADDR	action.h	84;"	d
+ADC1_PIN_BASE	action.h	82;"	d
+ADC2_I2C_ADDR	action.h	85;"	d
+ADC2_PIN_BASE	action.h	83;"	d
+ADC_CHAN1	action.h	87;"	d
+ADC_CHAN2	action.h	88;"	d
+ADC_CHAN3	action.h	89;"	d
+ADC_CHAN4	action.h	90;"	d
+ADC_CHAN5	action.h	91;"	d
+ADC_CHAN6	action.h	92;"	d
+APP	Makefile	/^APP =  ldrattnapp$/;"	m
+AR	Makefile	/^AR=ar$/;"	m
+BALANCE_UPDATE	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	e	enum:__anon6	file:
+BalanceChan	common.h	/^typedef enum { LEFTCHAN, RIGHTCHAN } BalanceChan;$/;"	t	typeref:enum:__anon7
+CALIBRATED	ldrattnapp.h	/^typedef enum { CALIBRATED, NOTCALIBRATED } Calibstate;$/;"	e	enum:__anon1
+CC	Makefile	/^CC=gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -Wall -g $/;"	m
+CHANNEL_1	ltc2655.h	2;"	d
+CHANNEL_2	ltc2655.h	3;"	d
+CHANNEL_3	ltc2655.h	4;"	d
+CHANNEL_4	ltc2655.h	5;"	d
+CHANNEL_ALL	ltc2655.h	1;"	d
+CLIENT	Makefile	/^CLIENT = client$/;"	m
+CMDLEN	ldrattnapp.c	23;"	d	file:
+COBJ	Makefile	/^COBJ = $(patsubst %,$(ODIR)\/%,$(_COBJ))$/;"	m
+CSV_APPEND_NULL	csv.h	25;"	d
+CSV_COMMA	csv.h	35;"	d
+CSV_CR	csv.h	33;"	d
+CSV_EINVALID	csv.h	16;"	d
+CSV_EMPTY_IS_NULL	csv.h	26;"	d
+CSV_ENOMEM	csv.h	14;"	d
+CSV_EPARSE	csv.h	13;"	d
+CSV_ETOOBIG	csv.h	15;"	d
+CSV_LF	csv.h	34;"	d
+CSV_MAJOR	csv.h	7;"	d
+CSV_MINOR	csv.h	8;"	d
+CSV_QUOTE	csv.h	36;"	d
+CSV_RELEASE	csv.h	9;"	d
+CSV_REPALL_NL	csv.h	21;"	d
+CSV_SPACE	csv.h	32;"	d
+CSV_STRICT	csv.h	20;"	d
+CSV_STRICT_FINI	csv.h	22;"	d
+CSV_SUCCESS	csv.h	12;"	d
+CSV_TAB	csv.h	31;"	d
+Calibstate	ldrattnapp.h	/^typedef enum { CALIBRATED, NOTCALIBRATED } Calibstate;$/;"	t	typeref:enum:__anon1
+DAC_CHAN1	action.h	77;"	d
+DAC_CHAN2	action.h	78;"	d
+DAC_CHAN3	action.h	79;"	d
+DAC_CHAN4	action.h	80;"	d
+DAC_I2C_ADDR	action.h	76;"	d
+DATA_RATE_475	action.h	94;"	d
+DBMAX	action.h	100;"	d
+DEBUG	ldrattnapp.c	25;"	d	file:
+DEBUG_H	debug.h	3;"	d
+DEFAULT_BALANCE_VALUE_DB	common.h	4;"	d
+DEFAULT_CALIB_STEPS	common.h	3;"	d
+DEFAULT_IMPEDANCE	common.h	2;"	d
+DEFAULT_TEMPERATURE	common.h	5;"	d
+DEFAULT_VOLUME	common.h	1;"	d
+DELAY_LDR_STABLE	action.h	96;"	d
+DEPS	Makefile	/^DEPS = $(patsubst %,$(IDIR)\/%,$(_DEPS))$/;"	m
+FIELD_BEGUN	libcsv.c	31;"	d	file:
+FIELD_MIGHT_HAVE_ENDED	libcsv.c	32;"	d	file:
+FIELD_NOT_BEGUN	libcsv.c	30;"	d	file:
+HIGH	action.h	18;"	d
+LDRATTNAPP_H	ldrattnapp.h	2;"	d
+LDRAttr	ldrattnapp.h	/^}LDRAttr;$/;"	t	typeref:struct:__anon4
+LDRCmd	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	t	typeref:enum:__anon6	file:
+LDRConf	ldrattnapp.h	/^}LDRConf;$/;"	t	typeref:struct:__anon5
+LDR_CONF	cfgparser.c	/^char *LDR_CONF = "\/usr\/local\/etc\/ldrattn\/ldrattn.conf";$/;"	v
+LDR_FULL_MAX	action.h	10;"	d
+LDR_LOW_TOLERANCE	action.h	8;"	d
+LDR_LSE_MIN	action.h	45;"	d
+LDR_LSH_MIN	action.h	46;"	d
+LDR_R1	action.h	41;"	d
+LDR_R18	action.h	42;"	d
+LDR_RSE_MIN	action.h	47;"	d
+LDR_RSH_MIN	action.h	48;"	d
+LDR_VOLTAGE	action.h	40;"	d
+LDR_ZERO_MIN	action.h	9;"	d
+LDRdata	ldrattnapp.h	/^} LDRdata;$/;"	t	typeref:struct:__anon2
+LDRfd	action.c	/^int LDRfd;$/;"	v
+LDRtargetres	ldrattnapp.h	/^} LDRtargetres;$/;"	t	typeref:struct:__anon3
+LEFTCHAN	common.h	/^typedef enum { LEFTCHAN, RIGHTCHAN } BalanceChan;$/;"	e	enum:__anon7
+LIBCSV_H__	csv.h	2;"	d
+LIBS	Makefile	/^LIBS=-lm -lpthread -lwiringPi$/;"	m
+LOAD_IMPEDANCE	action.h	35;"	d
+LOCK_FILE	action.h	99;"	d
+LOGGER_H	logger.h	3;"	d
+LOG_TRACE	debug.c	/^void LOG_TRACE(int lvl, char *fmt, ... )$/;"	f
+LOW	action.h	19;"	d
+LTC2655_CMD_EXTERNAL_REF	ltc2655.h	16;"	d
+LTC2655_CMD_INTERNAL_REF	ltc2655.h	15;"	d
+LTC2655_CMD_PD_ALL	ltc2655.h	13;"	d
+LTC2655_CMD_PD_ALL	ltc2655.h	14;"	d
+LTC2655_CMD_PD_N	ltc2655.h	12;"	d
+LTC2655_CMD_UP_N	ltc2655.h	9;"	d
+LTC2655_CMD_WR_INPUT_N	ltc2655.h	8;"	d
+LTC2655_CMD_WR_UP_ALL	ltc2655.h	10;"	d
+LTC2655_CMD_WR_UP_N	ltc2655.h	11;"	d
+MAXBUF	cfgparser.c	23;"	d	file:
+MAXLEN	client.c	14;"	d	file:
+MAXLEN	ldrattnapp.h	5;"	d
+MAX_ARG	ldrattnapp.c	24;"	d	file:
+MAX_BUF_LEN	csvparser.c	17;"	d	file:
+MAX_FIELDS	csvparser.c	16;"	d	file:
+MAX_LDR_INPUT	action.h	97;"	d
+MEM_BLK_SIZE	libcsv.c	44;"	d	file:
+MINARGS	client.c	15;"	d	file:
+MIN_VOLUME_STEPS	ldrattnapp.h	7;"	d
+MKDIR	Makefile	/^MKDIR=mkdir$/;"	m
+MUTE	action.h	20;"	d
+NOM_IMPEDANCE	action.h	34;"	d
+NOTCALIBRATED	ldrattnapp.h	/^typedef enum { CALIBRATED, NOTCALIBRATED } Calibstate;$/;"	e	enum:__anon1
+OBJ	Makefile	/^OBJ = $(patsubst %,$(ODIR)\/%,$(_OBJ))$/;"	m
+ODIR	Makefile	/^ODIR = obj$/;"	m
+OFF	action.h	16;"	d
+ON	action.h	15;"	d
+PGA_4V	action.h	93;"	d
+PIN_ADC_LSE	action.h	27;"	d
+PIN_ADC_LSH	action.h	28;"	d
+PIN_ADC_RSE	action.h	29;"	d
+PIN_ADC_RSH	action.h	30;"	d
+PIN_CALIB_L	action.h	31;"	d
+PIN_CALIB_R	action.h	32;"	d
+PIN_DAC_LSE	action.h	22;"	d
+PIN_DAC_LSH	action.h	23;"	d
+PIN_DAC_RSE	action.h	24;"	d
+PIN_DAC_RSH	action.h	25;"	d
+RELOAD_CONFIG	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	e	enum:__anon6	file:
+RIGHTCHAN	common.h	/^typedef enum { LEFTCHAN, RIGHTCHAN } BalanceChan;$/;"	e	enum:__anon7
+ROW_NOT_BEGUN	libcsv.c	29;"	d	file:
+SAVE_CALIB	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	e	enum:__anon6	file:
+SET_VOLUME	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	e	enum:__anon6	file:
+SIZE_MAX	libcsv.c	23;"	d	file:
+SOBJ	Makefile	/^SOBJ = $(patsubst %,$(ODIR)\/%,$(_SOBJ))$/;"	m
+SOCK_PATH	client.c	13;"	d	file:
+SOCK_PATH	ldrattnapp.c	22;"	d	file:
+START_CALIB	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	e	enum:__anon6	file:
+STATIC	Makefile	/^STATIC=libcsv.a$/;"	m
+SUBMIT_FIELD	libcsv.c	47;"	d	file:
+SUBMIT_FIELD	libcsv.c	62;"	d	file:
+State	ldrattnapp.c	/^Calibstate State;$/;"	v
+TEMP_COMPENSATE	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	e	enum:__anon6	file:
+VOL_DEFAULT	action.h	37;"	d
+VOL_MAX_STEP	ldrattnapp.h	4;"	d
+WRITE_CONFIG	client.c	/^typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; $/;"	e	enum:__anon6	file:
+_COBJ	Makefile	/^_COBJ = client.o$/;"	m
+_DEPS	Makefile	/^_DEPS = debug.h $/;"	m
+_OBJ	Makefile	/^_OBJ = ltc2655.o ldrattnapp.o debug.o action.o csvparser.o cfgparser.o logger.o $/;"	m
+_SOBJ	Makefile	/^_SOBJ = libcsv.o$/;"	m
+attr	ldrattnapp.c	/^struct volumeattr attr;$/;"	v	typeref:struct:volumeattr
+balanceChan	ldrattnapp.h	/^	int balanceChan;$/;"	m	struct:volumeattr
+balanceChan	ldrattnapp.h	/^	unsigned int balanceChan; $/;"	m	struct:__anon5
+balanceValue	ldrattnapp.h	/^	int balanceValue;$/;"	m	struct:volumeattr
+balanceValue	ldrattnapp.h	/^	unsigned int balanceValue; $/;"	m	struct:__anon5
+balancechan	client.c	/^	unsigned int balancechan;$/;"	m	struct:ldrconf	file:
+balanceval	client.c	/^	unsigned int balanceval;$/;"	m	struct:ldrconf	file:
+blk_size	csv.h	/^  size_t blk_size;$/;"	m	struct:csv_parser
+calibSteps	ldrattnapp.h	/^	unsigned int calibSteps;$/;"	m	struct:__anon4
+calibSteps	ldrattnapp.h	/^	unsigned int calibSteps;$/;"	m	struct:__anon5
+callback1	csvparser.c	/^void callback1 (void *s, size_t i, void *outfile) {$/;"	f
+closeLog	logger.c	/^void closeLog()$/;"	f
+cmdParser	ldrattnapp.c	/^static int cmdParser(char *clientcmd)$/;"	f	file:
+count	csvparser.c	/^unsigned int count;$/;"	v
+csv_parser	csv.h	/^struct csv_parser {$/;"	s
+curImpedance	ldrattnapp.c	/^unsigned int curImpedance; \/\/curImpedance will be changed based on the callibrartion$/;"	v
+curVolume	ldrattnapp.c	/^unsigned int curVolume;$/;"	v
+dataL	ldrattnapp.h	/^	LDRdata dataL[VOL_MAX_STEP - 2];$/;"	m	struct:__anon4
+dataR	ldrattnapp.h	/^	LDRdata dataR[VOL_MAX_STEP - 2];$/;"	m	struct:__anon4
+db	csvparser.c	/^unsigned int db;$/;"	v
+debugLog	logger.c	/^void debugLog(int level,char *fmt,...)$/;"	f
+delim_char	csv.h	/^  unsigned char delim_char;$/;"	m	struct:csv_parser
+deltaCorrection	action.c	/^void deltaCorrection(struct volumeattr *attr)$/;"	f
+deltaTemp	ldrattnapp.h	/^	unsigned int deltaTemp; $/;"	m	struct:__anon5
+deltaThread	ldrattnapp.c	/^pthread_t deltaThread;$/;"	v
+doCalibration	action.c	/^int doCalibration(unsigned int impedance,int numsteps,int volume) {$/;"	f
+doSelfTest	action.c	/^static int doSelfTest()$/;"	f	file:
+entry_buf	csv.h	/^  unsigned char * entry_buf;   \/* Entry buffer *\/$/;"	m	struct:csv_parser
+entry_pos	csv.h	/^  size_t entry_pos;   \/* Current position in entry_buf (and current size of entry) *\/$/;"	m	struct:csv_parser
+entry_size	csv.h	/^  size_t entry_size;  \/* Size of entry buffer *\/$/;"	m	struct:csv_parser
+fd	ltc2655.c	/^int fd ;$/;"	v
+flag	csvparser.c	/^unsigned int flag;$/;"	v
+free_func	csv.h	/^  void (*free_func)(void *);$/;"	m	struct:csv_parser
+getAttFromStep	action.c	/^float getAttFromStep(int step) {$/;"	f
+getCSVFilename	csvparser.c	/^void getCSVFilename(unsigned int impedance,char *csvfile)$/;"	f
+getDeltaI	action.c	/^char getDeltaI(int sample) {$/;"	f
+getILSE	action.c	/^unsigned int getILSE() {$/;"	f
+getILSH	action.c	/^unsigned int  getILSH() {$/;"	f
+getIRSE	action.c	/^unsigned int getIRSE() {$/;"	f
+getIRSH	action.c	/^unsigned int getIRSH() {$/;"	f
+getRLSE	action.c	/^unsigned long getRLSE() {$/;"	f
+getRLSH	action.c	/^unsigned long getRLSH() {$/;"	f
+getRRSE	action.c	/^unsigned long getRRSE() {$/;"	f
+getRRSH	action.c	/^unsigned long getRRSH() {$/;"	f
+getResistance	action.c	/^unsigned long getResistance(int  measure_raw, int seriesLDRres, int refResistor) {$/;"	f
+getRxFromAttAndImp	action.c	/^unsigned long getRxFromAttAndImp(float att, unsigned long imp) {$/;"	f
+getRxFromAttAndRy	action.c	/^unsigned long getRxFromAttAndRy(float att, unsigned long ry) {$/;"	f
+getRyFromAttAndImp	action.c	/^unsigned long getRyFromAttAndImp(float att, unsigned long imp) {$/;"	f
+getRyFromAttAndRx	action.c	/^unsigned long getRyFromAttAndRx(float att, unsigned long rx) {$/;"	f
+getSample	action.c	/^unsigned int  getSample(int channel) {$/;"	f
+i_SE	ldrattnapp.h	/^	unsigned int i_SE;            \/\/ current series $/;"	m	struct:__anon2
+i_SH	ldrattnapp.h	/^	unsigned int i_SH;            \/\/ current shunt$/;"	m	struct:__anon2
+impedance	client.c	/^	unsigned int impedance;$/;"	m	struct:ldrconf	file:
+impedance	ldrattnapp.h	/^	unsigned int impedance;$/;"	m	struct:__anon5
+initWiringPiDevices	action.c	/^int  initWiringPiDevices()$/;"	f
+is_space	csv.h	/^  int (*is_space)(unsigned char);$/;"	m	struct:csv_parser
+is_term	csv.h	/^  int (*is_term)(unsigned char);$/;"	m	struct:csv_parser
+ldrTemp	ldrattnapp.h	/^	unsigned int ldrTemp;      \/\/$/;"	m	struct:__anon4
+ldrattn	action.c	/^LDRAttr ldrattn;$/;"	v
+ldrattn	csvparser.c	/^LDRAttr ldrattn;$/;"	v
+ldrattn	ldrattnapp.c	/^LDRAttr ldrattn;$/;"	v
+ldrconf	cfgparser.c	/^LDRConf ldrconf;$/;"	v
+ldrconf	client.c	/^struct ldrconf {$/;"	s	file:
+ldrconf	csvparser.c	/^LDRConf ldrconf;$/;"	v
+ldrconf	ldrattnapp.c	/^LDRConf ldrconf;$/;"	v
+loadDefParams	cfgparser.c	/^void loadDefParams()$/;"	f
+ltc2655Setup	ltc2655.c	/^int ltc2655Setup (int i2cAddr)$/;"	f
+main	client.c	/^int main(int argc,char *argv[])$/;"	f
+main	ldrattnapp.c	/^int main()$/;"	f
+malloc_func	csv.h	/^  void *(*malloc_func)(size_t);$/;"	m	struct:csv_parser
+openLog	logger.c	/^void openLog()$/;"	f
+options	csv.h	/^  unsigned char options;$/;"	m	struct:csv_parser
+potImpedence	ldrattnapp.h	/^	unsigned int potImpedence;$/;"	m	struct:__anon4
+printCalibData	ldrattnapp.c	/^static void printCalibData()$/;"	f	file:
+print_usage	client.c	/^void print_usage()$/;"	f
+pstate	csv.h	/^  int pstate;         \/* Parser state *\/$/;"	m	struct:csv_parser
+pw_SE	ldrattnapp.h	/^	unsigned int pw_SE;            \/\/ series$/;"	m	struct:__anon2
+pw_SH	ldrattnapp.h	/^	unsigned int pw_SH;            \/\/ shunt$/;"	m	struct:__anon2
+quote_char	csv.h	/^  unsigned char quote_char;$/;"	m	struct:csv_parser
+quoted	csv.h	/^  int quoted;         \/* Is the current field a quoted field? *\/$/;"	m	struct:csv_parser
+readCalibData	csvparser.c	/^int readCalibData(char *Fname) $/;"	f
+readLDRConfig	ldrattnapp.c	/^static void readLDRConfig()$/;"	f	file:
+readParseCfg	cfgparser.c	/^int readParseCfg()$/;"	f
+realloc_func	csv.h	/^  void *(*realloc_func)(void *, size_t);$/;"	m	struct:csv_parser
+removespace	cfgparser.c	/^void removespace (char * s)$/;"	f
+saveCalibration	action.c	/^int saveCalibration(unsigned int impedance,unsigned int steps)$/;"	f
+series	ldrattnapp.h	/^	unsigned int series;$/;"	m	struct:__anon3
+setCalibrationRelays	action.c	/^void setCalibrationRelays(unsigned int val) {$/;"	f
+setLSE	action.c	/^int setLSE(int val) $/;"	f
+setLSE_Range	action.c	/^void setLSE_Range(int val)$/;"	f
+setLSH	action.c	/^int setLSH(int val) $/;"	f
+setLSH_Range	action.c	/^void setLSH_Range(int val)$/;"	f
+setMute	action.c	/^void setMute(int volume)$/;"	f
+setRSE	action.c	/^int setRSE(int val) $/;"	f
+setRSE_Range	action.c	/^void setRSE_Range(int val)$/;"	f
+setRSH	action.c	/^int setRSH(int val) $/;"	f
+setRSH_Range	action.c	/^void setRSH_Range(int val)$/;"	f
+setVolume	action.c	/^void setVolume(int volume)$/;"	f
+set_dac_channel_raw	action.c	/^int set_dac_channel_raw(int channel,int val){$/;"	f
+shunt	ldrattnapp.h	/^	unsigned int shunt;$/;"	m	struct:__anon3
+spaces	csv.h	/^  size_t spaces;      \/* Number of continious spaces after quote or in a non-quoted field *\/$/;"	m	struct:csv_parser
+startCorrectionThread	ldrattnapp.c	/^static void startCorrectionThread()$/;"	f	file:
+status	csv.h	/^  int status;         \/* Operation status *\/$/;"	m	struct:csv_parser
+steps	client.c	/^	unsigned int steps;$/;"	m	struct:ldrconf	file:
+stopCorrectionThread	ldrattnapp.c	/^static void stopCorrectionThread()$/;"	f	file:
+storeMaxVolume	action.c	/^void storeMaxVolume(impedance,numsteps)$/;"	f
+storeZeroVolume	action.c	/^void storeZeroVolume(unsigned int impedance)$/;"	f
+sysLogFile	logger.c	/^const char *sysLogFile = "\/var\/log\/ldrattnapp.log";$/;"	v
+targetres	ldrattnapp.h	/^	LDRtargetres targetres[VOL_MAX_STEP - 2];$/;"	m	struct:__anon4
+temperature	client.c	/^	unsigned int temperature;$/;"	m	struct:ldrconf	file:
+volume	client.c	/^	unsigned int volume;$/;"	m	struct:ldrconf	file:
+volume	ldrattnapp.h	/^	int volume;$/;"	m	struct:volumeattr
+volume	ldrattnapp.h	/^	unsigned int volume;$/;"	m	struct:__anon5
+volumeattr	ldrattnapp.h	/^struct volumeattr {$/;"	s
+writeCalibData	csvparser.c	/^int writeCalibData(char *Fname,unsigned int steps)$/;"	f
+writeCommand	ltc2655.c	/^void writeCommand (int channel, int command)$/;"	f
+writeDigitalData	ltc2655.c	/^int writeDigitalData (int channel, int val)$/;"	f
+writeLDRConfig	cfgparser.c	/^int writeLDRConfig(unsigned int steps,unsigned int impedance,unsigned int volume,unsigned int balancechan,unsigned int balancevalue,unsigned int temp)$/;"	f
