@@ -1,0 +1,37 @@
+#! /bin/sh
+#
+# This is an init script for Debian Sid
+# Copy it to /etc/init.d/ldrattnapp 
+#
+
+
+test -f /usr/local/sbin/ldrattnapp || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting ldrattnapp  daemon: ldrattnapp"
+    start-stop-daemon --start --background -m --quiet --pidfile /var/run/ldrattnapp.pid --exec /usr/local/sbin/ldrattnapp  
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping ldrattnapp daemon: ldrattnapp"
+    start-stop-daemon --stop --quiet --pidfile /var/run/ldrattnapp.pid --exec /usr/local/sbin/ldrattnapp
+    echo "."
+    ;;
+  reload|force-reload)
+    start-stop-daemon --stop --quiet --pidfile /var/run/ldrattnapp.pid  --signal 1 --exec /usr/local/sbin/ldrattnapp
+    ;;
+  restart)
+    echo -n "Stopping ldrattnapp daemon: ldrattnapp"
+    start-stop-daemon --stop --quiet --pidfile /var/run/ldrattnapp.pid --exec /usr/local/sbin/ldrattnapp
+    sleep 1
+    echo -n "Starting ldrattnapp daemon: ldrattnapp"
+    start-stop-daemon --start --background -m --quiet --pidfile /var/run/ldrattnapp.pid --exec /usr/local/sbin/ldrattnapp
+    echo "."
+    ;;
+  *)
+    echo "Usage: /etc/init.d/ldrattnapp {start|stop|reload|restart|force-reload}"
+    exit 1
+esac
+
+exit 0
