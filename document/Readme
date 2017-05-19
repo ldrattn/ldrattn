@@ -1,0 +1,78 @@
+LDR ATTENUATION 
+
+Reference links
+https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/
+
+Installation steps:
+1. ssh to raspberry pi target board 
+ssh pi@192.168.0.195
+passwd: raspberry
+
+2.Become super user 
+sudo su -
+
+3.create a directory on target board.
+> git init
+> git pull https://github.com/ldrattn/ldrattn.git
+> cd wiringpi/APP
+> make ; make install
+> cp ../../scripts/ldrattnapp /etc/init.d/
+
+Test setup:
+
+We need two terminals looged in to raspberry pi target board. On one terminal run the server(ldrattnapp)
+and on second terminal run the  client application(client).
+ 
+1. ssh to raspberry pi target board 
+ssh pi@192.168.0.195
+passwd : raspberry
+
+2.Become super user 
+sudo su -
+
+3. cd /usr/src/LDRAPP/APP
+4. run ldrattnapp 
+5. run client app (/usr/src/LDRAPP/APP/client).
+6. The client runs set of commands for example
+   to start calibrartion, ./client -C -i 10 -s 48 
+
+7. we can check the usage of client, by running ./client --help
+Usage: ./client
+        -C start calibrartion
+	-V set volume
+	-R reload configuration
+	-S save calibration
+	-T temperature compenstaion
+	-W write configuration
+	-B set balance update
+	-s arg number of calibrarion steps
+	-b arg balance value
+	-c arg balance channel
+	-i arg impedance
+	-v arg volume to be set 
+
+
+a) Start calibration: 
+./client -C -i 10 -s 48 . here -i is the impedance and -s is the number of steps 
+b) Save calibration:
+	 ./client -S  . This comamnd invokes the ldrattnapp to save  the calibrated values to a file in directory /usr/local/etc/ldrattn/csv .
+
+c) Write configuration:
+ ./client -W -s 20 -i 30 -v  32 -c 1 -b 1 -t 25
+ writes to configuration file with steps 20,impedance 30,default volume 32,balanace channel right,balance value 1 and temperature 25 degree. The configuration file is located in path /usr/local/etc/ldrattn/ldrattn.conf
+
+d) Set volume: ./client -V -v 30
+  This sets the volume to 30the step  value of calibrartion.
+e) Reload configuration: 
+  ./client -R
+   This reloads the configuration.
+h) Balance Update: 
+  ./client -B -c 1 -b 1
+   This command changes the balance value for left and right channel.
+   -c channel to  set,  right (1) and for left (0) 
+   -b balance value to be set is 1
+
+i) Temperature compensate: 
+   ./client -T -t 25
+   -t temperature set to 25degree
+
