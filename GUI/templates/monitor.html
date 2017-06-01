@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />		
+		<style type="text/css" title="currentStyle">
+			@import "../static/css/demo_page.css";
+			@import "../static/css/demo_table_jui.css";
+			@import "../static/css/jquery-ui-1.8.4.custom.css";
+			/*.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+				border: 1px solid #d3d3d3;
+				background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400-sub.png) 50% 50% repeat-x;
+				font-weight: normal;
+				color: #fff;
+			}
+			.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+				color: #fff;
+				text-decoration: none;
+			}*/
+		
+		</style>
+		<script src="../static/js/jquery.min.js"></script>
+		<script type="text/javascript" src="../static/js/jquery.dataTables.js"></script>
+		
+		<script type="text/javascript">
+			var paging = '<?php echo $paging ?>';
+			paging = parseInt(paging);
+			
+			$(document).ready(function() {
+				
+				
+				oTable = $('#Treport').dataTable({
+					"sScrollY": 216,
+					"bJQueryUI" : true,
+					"sPaginationType" : "full_numbers",
+					"iDisplayLength": paging,
+					"aLengthMenu": [[5, 10, 20, 30, -1], [5, 10, 20, 30, "All"]],
+					"sDom": 'lfrtip' //shows on table with headers and data(i.e. without any header or footer)
+				});
+				
+				jQuery.fn.dataTableExt.oSort['html-undefined']  = function(a,b) {
+				    return false;
+				};
+				
+				$('.sorting_disabled').unbind('click');
+				$('.sorting_disabled span').remove();
+				
+				$("#siptrunks_paginate").click(function() {
+					$("input:checkbox").each(function() {
+						$(this).attr("checked", "");
+					});
+				});
+				
+				/* Data-tables End */
+				
+				var i = 0;
+				$("input:checkbox[name='chkbox']").each(function() {
+					i++;
+				});
+				if(i == 0) {
+					$("#checkall").attr("disabled", "disabled");
+				}
+				
+				$("#checkall").click(function() {
+					if ($("#checkall").is(":checked")) {
+						$("input[type='checkbox']").attr("checked", "checked");
+						$("#delete_selected").attr('class','btn-grey-wide-l');
+						$('#delete_selected').click(function() {
+							delete_data_all();
+						});
+					} else {
+						$("input[type='checkbox']").attr("checked", "");
+						$("#delete_selected").attr('class','btn-grey-wide-l-disabled');
+						$('#delete_selected').attr('onclick','').unbind('click');
+					}
+				});
+			});
+			
+			function uncheck() {
+				var i = 0;
+				$("input:checkbox[name='chkbox']:checked").each(function() {
+					i++;
+				});
+				if(i == 0) {
+					$("#delete_selected").attr('class','btn-grey-wide-l-disabled');
+					$('#delete_selected').attr('onclick','').unbind('click');
+				} else {
+					$("#delete_selected").attr('class','btn-grey-wide-l');
+					$('#delete_selected').click(function() {
+						delete_data_all();
+					});
+				}
+				if ($("#checkall").is(":checked")) {
+					$("#checkall").attr("checked", "");
+				}
+			}
+			
+			function edit_data(val) {
+				parent.callEditPage(val, 'add-trunks.php', 560, 600);
+			}
+			
+			function add_data() {
+				parent.callAddPage('add-trunks.php', 560, 600);
+			}
+			
+			function delete_data(val) {
+				parent.callConfirmBox(val);
+			}
+			
+			function delete_data_all() {
+				var all_trunks = new Array();
+				var i = 0;
+				$("input:checkbox[name='chkbox']:checked").each(function() {
+					all_trunks[i++] = $(this).val();
+				});
+				var trunk_list = all_trunks.toString();
+				parent.callConfirmAllBox(trunk_list);
+			}
+			
+			function deleteAction(val, deletetoken) {
+				var formObj = document.forms[0];
+				if(val == 1) {
+					formObj.submit_action.value = "3";
+					formObj.TRUNK.value = deletetoken;
+					formObj.submit();
+				}
+			}
+			
+			function deleteAllAction(val, deletetoken) {
+				var formObj = document.forms[0];
+				if(val == 1) {
+					formObj.submit_action.value = "4";					
+					formObj.submit();
+				}
+			}
+
+
+			function report_data(val){
+					//formObj.submit_action.value = val;					
+					//formObj.submit();
+					window.open('download_Template.php?type=' + val);
+			}
+			
+			function del_data(){
+					parent.callConfirmAllBox("All Reports");
+					//alert('Del');
+			}
+			function f1(val) {
+				/*if(val == 1) {
+					parent.closeAddEditDialog();
+					parent.document.getElementById("container").src = "sip-trunks.php";
+				}*/
+
+			}
+		</script>
+	</head>
+	<body onclick="javascript: parent.hideMenu()" onload="f1('<?php echo $res ?>')">
+		<div class="content">
+			<h1>Monitor<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(2)" /></h1>
+
+			<tr style="background-color:#fff">
+				<td>
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+						<tr>
+							<td>&nbsp;&nbsp;</td>
+							<td style="font-size: 16px; font-weight: bold">
+							<label style="">
+							PoT : <span><?php echo $lines[0] ?></span>kohms &nbsp; Volume: <span><?php echo $lines[3] ?></span>  at 25 &#x2103 &nbsp;&nbsp;&nbsp;&nbsp; </label> 								</td>
+							
+						</tr>
+					</table>
+				</td>
+			</tr>
+
+
+
+
+			<div id="siptrunksbody" style="height: ; overflow-y: hidden; width: 95%; overflow-x: hidden">
+				<div id="dt_example">
+				<div id="container" style="font-size: 13px">
+				<div class="demo_jui" style="box-shadow: 5px 5px 5px #aaa">
+					<table border="0" cellpadding="0" cellspacing="0" style="margin: 0px" class="table-config no-border">
+					<table cellpadding="0" cellspacing="0" border="0" class="display" id="Treport">
+						<thead>
+							<tr>
+								<!--
+								<th class="sorting_disabled"><input type="checkbox" id="checkall" align="center" /></th>-->
+								<th><a href="#">S.No</a></th>
+								<th><a href="#">ADC_Right Series</a></th>
+								<th><a href="#">ADC_Right Shunt</a></th>
+								<th><a href="#">ADC_Left Series</a></th>
+								<th><a href="#">ADC_Left Shunt</a></th>
+								<th><a href="#">DAC_Right Series</a></th>
+								<th><a href="#">DAC_Right Shunt</a></th>
+								<th><a href="#">DAC_Left Series</a></th>
+								<th><a href="#">DAC_Left Shunt</a></th>
+								
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+
+							for($i=0; $i<14; $i++) {
+
+							$dac_RSE = $csv[$i][0];
+							$dac_RSH = $csv[$i][1];
+							$adc_RSE = $csv[$i][2];
+							$adc_RSH = $csv[$i][3];
+							$dac_LSE = $csv[$i][4];
+							$dac_LSH = $csv[$i][5];
+							$adc_LSE = $csv[$i][6];
+							$adc_LSH = $csv[$i][7];
+
+							echo "<tr>
+								<td>$i</td>
+								<td>$adc_RSE</td>
+								<td>$adc_RSH</td>
+								<td>$adc_LSE</td>
+								<td>$adc_LSH</td>
+								<td>$dac_RSE</td>
+								<td>$dac_RSH</td>
+								<td>$dac_LSE</td>
+								<td>$dac_LSH</td>
+							       </tr>";
+							}
+							?>
+						</tbody>
+					</table>
+				</table>
+				</div>
+				</div>
+				</div>
+				<div style="height: 10px">&nbsp;</div>
+			</div>
+			<div class="page-btns">
+			<!--	<a  class='btn-grey-wide-l' onclick='report_data(1)'><span>Serial & Mac CSV Report</span></a>
+				<a  class='btn-grey-wide-l' onclick='report_data(2)'><span>Serial & Mac Test CSV Report</span></a>
+				<a  class='btn-grey-wide-l' onclick='report_data(3)'><span>Complete Text Report</span></a>
+				<a class='btn-grey-wide-l' onclick='del_data()'><span>Delete All</span></a>-->
+			</div>
+		</div>
+		<form id="deleteform" method="post" action="">
+			<input type="hidden" name="submit_action" value="0" />
+			<input type="hidden" name="TRUNK" id="TRUNK" value="" />
+			<input type="hidden" name="TRUNKLIST" id="TRUNKLIST" value="" />
+		</form>
+	</body>
+	<script type="text/javascript">
+		parent.setUpdateValue('<?php echo $update_count ?>');
+	</script>
+</html>

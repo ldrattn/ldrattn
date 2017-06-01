@@ -1,0 +1,30 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * General page setup
+ */
+#dt_example {
+	font: 80%/1.45em "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+	margin: 0;
+	padding: 0;
+	color: #333;
+	background-color: #fff;
+}
+
+#dt_example #container {
+	width: 95%;
+	margin: 0px auto;
+	padding: 0;
+}
+
+#dt_example #footer {
+	margin: 0px auto 0 auto;
+	padding: 0;
+}
+
+#dt_example #demo {
+	margin: 0px auto 0 auto;
+}
+
+#dt_example .demo_jui {
+	margin: 5px auto 0 auto;
+	border-bottom-right-radius: 4px;
+}

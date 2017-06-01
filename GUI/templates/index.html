@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" href="../static/css/themes/base/jquery.ui.core.css">
+		<link rel="stylesheet" href="../static/css/themes/base/jquery.ui.theme.css">
+		<link rel="stylesheet" href="../static/css/themes/base/jquery.ui.accordion.css">
+		<!--<link rel="stylesheet" href="../static/css/demos.css">--><!-- san-->
+		<link rel="stylesheet" href="../static/css/style.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/tooltip1.css" />
+		<script src="../static/js/jquery-1.9.1.js"></script>
+		<script src="../static/js/jquery.ui.core.js"></script>
+		<script src="../static/js/jquery.ui.widget.js"></script>
+		<script src="../static/js/jquery.ui.accordion.js"></script>
+		<script src="../static/js/jquery.ui.button.js"></script>
+		<script src="../static/js/jquery.ui.position.js"></script>
+		<script src="../static/js/jquery.ui.tooltip.js"></script>
+		<script src="../static/js/jquery.ui.dialog.js"></script>
+		<script src="../static/js/menu.js"></script>
+		<script src="../static/js/brand.js"></script>
+		<script type="text/javascript">
+			var $main = $.noConflict(true);
+		</script>
+		<script type="text/javascript">
+		
+		</script>
+		<script src="../static/js/index.js"></script>
+		<style>
+			.ui-menu {
+				position: absolute;
+				width: 100px;
+			}
+			.no-close .ui-dialog-titlebar-close {
+				display: none;
+			}
+
+			.custom-add-edit-dialog {
+				border: none;
+				padding: 0px;
+				color: #444444;
+			}
+
+			#tooltip {
+				max-width: 400px;
+				opacity: 1;
+			}
+			.btn-reboot-warning {
+				display: none;
+				width: 36px;
+				height: 26px;
+				background: url(../static/images/warning-reboot.png) no-repeat transparent;
+				border: none;
+				float: right;
+				color: white;
+				font-size: 12px;
+				margin-top: 2px;
+				cursor: pointer;
+				font-weight: bold;
+			}
+		</style>		
+	</head>
+	<body onclick="hideMenu()">
+		<table style="margin: 0 auto; width: 100%;" cellpadding="0" cellspacing="0">
+			<tr>
+				<td valign="top">
+				<table style="width: 100%; height: 90px;" cellpadding="0" cellspacing="0">
+					<tr>
+						<td class="page-header"><div class="main-logo"></div>
+						<div class="login-details-div" >
+							<div class="login-details" style="display: none">
+								Last Login : Wed 10, 2013
+								<br />
+								Current Login : Fri 12, 2013
+							</div>
+<!--						</div>
+<a id="applychanges" class="apply-changes-disable" onclick="setUpdates(this)"><a id="applychangessaving" class="apply-changes-saving"></a>-->
+						<!--
+						<input id="updates" type="button" class="btn-notify" value="0" onclick="updateDetails(this)" onfocus="if(this.blur)this.blur()" />
+						<a class="reboottip" title="<b>System needs to be Rebooted</b> to successfully apply all the updated configurations."><input id="reboot-warning" type="button" class="btn-reboot-warning" onclick="" onfocus="if(this.blur)this.blur()" /></a>-->
+						</td>
+					</tr>
+				</table>
+				<table style="width: 100%;" cellpadding="0" cellspacing="0">
+					<tr>
+						<td class="page-title-bar">
+						<table style="width: 100%; height: 30px;" cellpadding="0" cellspacing="0">
+							<tr>
+								<td style="width: 30%; border-right: 2px solid #b2cbe5">
+								<table cellpadding="0" cellspacing="0">
+									<tr>
+										
+									</tr>
+								</table></td>
+								<td style="width: 35%; border-right: 2px solid #b2cbe5; font-size: 12px" align="center">
+									<!-- -->
+								</td>
+								<td style="width: 35%; font-size: 12px" align="center">
+								<table style="width: 100%">
+									<tr>
+										<td align="left">
+											<a id="btn-restore" class="btn-grey-wide-l-2" style="margin-top: 0px" onclick="refreshFrame()"><span>Refresh</span></a>
+										</td>
+										<td align="right" style="">
+											<div class="logout-panel">
+												<label style="float: left; padding: 5px; color: ">Welcome</label>
+												<label style="float: left; padding-top: 5px; color: #1454A1; font-weight: bold">Administrator &nbsp;</label>
+												<input type="button" class="btn-options" onclick="showMenu();" onfocus="if(this.blur)this.blur()" />
+												<span id="option-list-box" class="option-list-box">
+													<!--<input type="button" class="btn-option-list" value="Web Settings" onclick="webSettings()" onfocus="if(this.blur)this.blur()" />-->
+													<a href="logout.php" style="text-decoration: none">
+														<input type="button" class="btn-option-list" value="Logout" onfocus="if(this.blur)this.blur()" />
+													</a>
+												</span>
+											</div>
+										</td>
+									</tr>
+								</table></td>
+							</tr>
+						</table></td>
+					</tr>
+				</table></td>
+			</tr>
+			<tr>
+				<td valign="top">
+				<table style="width: 100%; height: 480px" cellpadding="0" cellspacing="0">
+					<tr>
+						<td id="main-menu" style="width: 18%;" valign="top"> 
+						{% include "menu.html" %}
+						</td>
+						<td style="width: 82%;" valign="top"><iframe src="" id="container" name="container" frameborder="0" style="height: 700px; width: 100%; border: 0px; margin: 0px;"></iframe></td>
+					</tr>
+				</table></td>
+			</tr>
+			<tr>
+				<td align="center" style="position: fixed; bottom: 0px; border-top: 1px solid #cccccc; width: 100%; background-color: #eeeeee; height: 30px">
+				<div id="page_footer" style="margin-top: 5px; color: #555; font-size: 11px">
+					
+				</div></td>
+			</tr>
+		</table>
+		<div id="dialog-confirm" title="Confirm">
+			<p id="confirmdata" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="confirmdata_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Are you sure you want to delete entire reports?
+				</div>
+			</p>
+		</div>
+
+		<div id="dialog-reboot" title="Confirm">
+			<p id="confirmreboot" style="display: none">
+				<img src="../static/images/icn-reboot.png" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="confirmreboot_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Are you sure you want to reboot the device?
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-success" title="Success">
+			<p id="confirmsuccess" style="display: none">
+				<div id="confirmsuccess_div" style="font-size: 13px; margin-left: 10px; display: none">
+					All the configuration files are successfully updated.
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-message" title="Message" >
+			<p id="apply_message" style="display: none">
+				<img src="../static/images/process-anim.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="apply_message_div" style="font-size: 13px; margin-left: 10px; padding-top: 12px; color:#00BFFF; display: none">
+					In progress, please wait...
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-apply-reboot" title="Confirm">
+			<p id="apply_reboot" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="apply_reboot_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Reboot is required to successfully apply all the updates.
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-upgrade-reboot" title="Confirm">
+			<p id="upgrade_reboot" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="upgrade_reboot_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Reboot is required to upgrade the firmware.<br/>
+					All the current configurations will be lost!
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-factory-reboot" title="Confirm">
+			<p id="factory_reboot" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="factory_reboot_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Reboot is required to reset the device to the factory default settings.
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-restore-reboot" title="Confirm">
+			<p id="restore_reboot" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="restore_reboot_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Reboot is required to restore the configuration.
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-network-reboot" title="Confirm">
+			<p id="network_reboot" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="network_reboot_div" style="font-size: 13px; margin-left: 10px; display: none">
+					<b>WARNING</b> : System will reboot to apply the network changes.<br>
+					Would you like to proceed?
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-utilities" title="Confirm">
+			<p id="utilities" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="utilities_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Would you like to proceed?
+				</div>
+			</p>
+		</div>
+		
+		<div id="dialog-error" title="Error">
+			<p id="apply_error" style="display: none">
+				<img src="../static/images/icn-error.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="apply_error_div" style="font-size: 13px; margin-left: 10px; display: none">
+					
+				</div>
+			</p>
+		</div>
+		<div id="dialog-datetime" title="Confirm" >
+			<p id="apply_datetime" style="display: none">
+				<img src="../static/images/icn-warning.gif" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+				<div id="apply_datetime_div" style="font-size: 13px; margin-left: 10px; display: none">
+					Changing the Configuration requires the current calls to be disconnected.
+				</div>
+			</p>
+		</div>
+		<div id="dialog-popup"></div>
+	</body>
+</html>

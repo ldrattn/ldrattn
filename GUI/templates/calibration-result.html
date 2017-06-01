@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />		
+		<script type="text/javascript">
+			//var cmd = '<?php echo $cmd ?>';
+			var pot = '{{ calibdata['pot'] }}';
+			var impd = '{{ calibdata['impedanceval'] }}';
+			var steps = '{{ calibdata['calibsteps'] }}';
+
+			
+			function callData() {
+				AjaxCall("system-calls?FTYPE=CALIBRATION&POT="+pot+"&IMPEDANCE="+impd+"&STEPS="+steps, 1);
+			}
+			function getCalibrationStatus(){
+				AjaxCall("system-calls?FTYPE=CALIBSTATUS&POT="+pot+"&IMPEDANCE="+impd+"&STEPS="+steps, 2);
+
+			}
+			function stopCalibration(){
+				AjaxCall("system-calls?FTYPE=STOPCALIBRATION&POT="+pot, 3);
+			}
+			
+			var httpObj = getHTTPObject();
+
+			function getHTTPObject() {
+				var xmlhttp;
+				if (window.XMLHttpRequest) {
+					xmlhttp = new XMLHttpRequest();
+				} else if (window.ActiveXObject) {
+					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+					if (!xmlhttp) {
+						xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+					}
+				}
+				return xmlhttp;
+			}
+			
+			function AjaxCall(ajax_URL, id) {
+				httpObj.open("GET", ajax_URL, true);
+				if (id == 1) {
+					httpObj.onreadystatechange = handleINFO;
+				}
+				if (id == 2) {
+					httpObj.onreadystatechange = handleSTATUS;
+				}
+				httpObj.send(null);
+			}
+			
+			function handleINFO() {
+				if (httpObj.readyState == 4) {
+					if (httpObj.status == 200) {
+						setINFO(httpObj.responseText);
+						if(calibstatus_interval==-1){
+							calibstatus_interval = setInterval(getCalibrationStatus, 5000);
+						}
+					}
+				}
+			}
+			function handleSTATUS() {
+				if (httpObj.readyState == 4) {
+					if (httpObj.status == 200) {
+						setINFO(httpObj.responseText);
+					}
+				}
+			}
+			
+			function setINFO(responseText) {
+				document.getElementById("testresult").innerHTML = responseText;
+			}
+			
+			function closeDialog() {
+				clearStatusInterval();
+				stopCalibration()
+				parent.closeAddEditDialog();
+				parent.document.getElementById("container").src = parent.document.getElementById("container").src;
+			}
+		</script>
+	</head>
+	<body class="popup">
+		<div class="mainborder">
+			<div class="pgtitle"><label id="pagetitle">Calibration Result</label><input type="button" class="btn-close" onclick="closeDialog()" onfocus="if(this.blur)this.blur()" /></div>
+			<div class="popup-content" style="height: 270px">
+				<div id="testresult" style="font-size: 12px; margin-left: 10px">
+					<div align="center" style="margin-top: 80px">
+						<img src="../static/images/loading1.gif" /><br />
+						<label style="font-weight: bold">Please wait</label>
+					</div>
+				</div>
+			</div>
+			<div class="popup-footer">
+				
+			</div>
+		</div>
+		<script>callData();</script>
+	</body>
+</html>

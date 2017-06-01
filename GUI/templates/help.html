@@ -1,0 +1,73 @@
+<?php
+	$param = 0;
+	
+	if(isset($_GET["param"])) {
+		$param = $_GET["param"];
+	}
+	
+	$anchors = array(
+		0 => 0, // top
+		1 => "_Toc376516624", // dashboard
+		2 => "_Toc376516625",	// sip-trunks
+		3 => "_Toc376516626", // pri-trunks
+		4 => "_Toc376516627", // calling groups
+		5 => "_Toc376516628", // call routing rules
+		6 => "_Toc376516629", // time route groups
+		7 => "_Toc376516630", // isdn pri settings
+		8 => "_Toc376516631", // sip global settings
+		9 => "_Toc376516632", // network settings
+		10 => "_Toc376516633", // date/time settings
+		11 => "_Toc376516634", // diagnostics
+		12 => "_Toc376516635", // back/up restore
+		13 => "_Toc376516636", // upgrade firmware
+		14 => "_Toc376516637", // call reports
+		15 => "_Toc376516638", // sip status
+		16 => "_Toc376516639", // pri status
+		17 => "_Toc376516640", // current calls
+		18 => "_Toc376516641" // network status
+	);
+	
+	$idx = $anchors[$param];
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title></title>
+		<script src="../static/js/jquery-1.8.2.min.js"></script>
+		<script src="../static/js/brand.js"></script>
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />
+		<script type="text/javascript">
+			$(document).ready(function() {
+				setTitle();
+				$("#help-content").css("height", window.innerHeight - 130+"px");
+				
+				$(window).resize(function() {
+					$("#help-content").css("height", window.innerHeight - 130+"px");
+				});
+				
+				var index = '<?php echo $idx ?>';
+				
+				//document.getElementById("help-content").src = "../Help/help.html#"+index;
+				document.getElementById("help-content").src = "../helpdata";
+			});
+			
+			function gototop() {
+				document.getElementById("help-content").src = "../helpdata";
+			}
+		</script>
+	</head>
+	<body class="popup">
+		<div class="mainborder">
+			<div class="pgtitle">Help</div>
+			<div class="popup-content" style="height: auto">
+				<div style="margin: 20px; margin-top: 0px; font-size: 13px">
+					<iframe src="" id="help-content" frameborder="0" style="height: 0px; width: 100%; border: 0px; margin: 0px;"></iframe>
+				</div>
+			</div>
+			<div class="popup-footer-help">
+				<input type="button" class="btn-top" title="Go to Top" onclick="gototop()" onfocus="if(this.blur)this.blur()" />
+			</div>
+		</div>
+	</body>
+</html>

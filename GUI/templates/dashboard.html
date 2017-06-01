@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="../static/js/jquery-1.8.2.min.js"></script>
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/tooltip.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/validationEngine.jquery.css" />
+		<script src="../static/js/jquery.validationEngine-en.js"></script>
+		<script src="../static/js/jquery.validationEngine.js"></script>
+		<script src="../static/js/simple-slider.js"></script>
+	  	<link href="../static/css/simple-slider.css" rel="stylesheet" type="text/css" />
+	 	<link href="../static/css/simple-slider-volume.css" rel="stylesheet" type="text/css" /> 
+		
+		<style>
+	 	 body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+	 	 [class^=slider] { display: inline-block; margin-bottom: 30px; }
+	  	.output { color: #888; font-size: 14px; padding-top: 1px; margin-left: 5px; vertical-align: top;}
+	  	h1 { font-size: 20px; }
+	  	h2 { clear: both; margin: 0; margin-bottom: 5px; font-size: 16px; }
+	  	p { font-size: 15px; margin-bottom: 30px; }
+	  	h2:first-of-type { margin-top: 0; }
+	  	</style>
+		<script type="text/javascript">
+			var $sub = $.noConflict(true);
+		</script>
+		<script type="text/javascript">
+			
+			var pot_val = '{{ ldrdata['impedance']|safe }}';
+			//alert(pot_val);
+			//var m_id = '<?php echo $mid ?>';
+			
+			$sub(document).ready(function () {
+				refreshPage();
+				if(pot_val == "Custom") {
+					$sub("#PROXY").show();
+				}else {
+					$sub("#PROXY").hide();
+				}
+				
+				
+				initValidation();			
+			});
+			
+			function initValidation() {
+					//alert("11111");
+				
+					$sub("#TEMP").attr("data-validation-engine","validate[required,custom[onlyNumberSp]]");
+					
+					$sub("#homeconfig").validationEngine('attach', {promptPosition : "bottomRight"});
+			
+			}
+
+			function submitData() {
+				
+				var formObj = document.forms[0];
+				if($sub("#homeconfig").validationEngine('validate')) {
+					$sub("#PVALUE").val($sub("#PVALUE_f").val());
+					$sub("#PROXY").val();
+					$sub("#TEMP").val();
+					
+					$sub("#bal_slide").val();
+					
+					$sub("#vol_slide").val();
+
+					//var formObj = document.forms[0];
+					formObj.submit_action.value = "1";
+					formObj.submit();
+				
+				}
+			}
+			
+			function refreshPage() {
+				var ref = '<?php echo $ref ?>';
+				if(ref == "1") {
+					parent.refreshFrame();
+				}
+			}
+			
+			function setDisplay() {
+				var regtype_val = $sub("#PVALUE_f").val();
+				var formObj = document.forms[0];
+				formObj.method="get";
+				formObj.PVALUE.value = regtype_val;
+				formObj.submit_action.value = "1";
+				formObj.submit();
+			}
+
+		</script>
+	</head>
+	<body onclick="javascript: parent.hideMenu()">
+		<div class="content">
+			<h1>Home<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(0)" /></h1>
+			<div id="sipstatusbody" style="height: ; overflow-y: hidden; width: 95%; overflow-x: hidden">
+				<div id="page-content">
+					<div class="clear"></div>
+					<div id="table-list">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<th width="760" class="btt" scope="col" style="font-size: 14px">ACTIVE</th>
+							</tr>
+						</table>
+						<form id="homeconfig" method="post" action="" autocomplete="off" onsubmit="return false">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+							<tbody>
+								<tr style="background-color:#f3f3f3" height="5"><td></td></tr>
+								<tr style="background-color:#f3f3f3">
+									<td>
+										<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+											<tr>
+												
+												<td>
+													<table width="100%" border="0" cellspacing="1" cellpadding="0" class="yui">
+														<tr style="font-size: small">
+														</tr>
+														<tr>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr style="background-color:#fff">
+									<td>
+										<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+											<tr>
+												<td style="font-size: 16px; font-weight: bold">
+										<label style="">
+										PoT Value &nbsp;&nbsp;&nbsp;&nbsp; </label> 										
+												</td>
+												<td style="font-size: 16px; font-weight: bold">
+												<select id="PVALUE_f" name="PVALUE_f" class="ipDrpBox" onchange="setDisplay()" onkeyup="setDisplay()" >
+									<option value="10" {{ "selected" if ldrdata['impedance'] == '10' }} >10</option>
+									<option value="30" {{ "selected" if ldrdata['impedance'] == '30' }} >30</option>
+									<option value="60" {{ "selected" if ldrdata['impedance'] == '60' }} >60</option>
+
+
+									<option value="80" {{ "selected" if ldrdata['impedance'] == '80' }} >80</option>
+									<option value="Custom" {{ "selected" if ldrdata['impedance'] == 'custom' }} >Custom</option>
+									</select>
+								<input maxlength="5" style="display:none" value="{{ ldrdata['impedanceval']}}" id="PROXY" name="PROXY" type="text" disabled class="ipBox-disabled" />
+									&nbsp;<label style="font-size: 10px">Kohms &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT {{ ldrdata['temp_calib'] }} &#x2103</label>
+
+												</td>
+											</tr>
+											<tr>
+												<td style="font-size: 16px; font-weight: bold">
+										<label style="">
+										Temp Compensate&nbsp;&nbsp;&nbsp;&nbsp; </label> 											
+										
+												</td>
+												<td style="font-size: 13px; font-weight: bold">
+												<input type="text" maxlength="15" class="ipBox" id="TEMP" name="TEMP"  style="text-align: right;" value="{{ ldrdata['temperature'] }}" />
+										&nbsp;<label style="font-size: 10px">eg: +2 &#x2103</label>
+												</td>
+											</tr>
+											<tr>
+												<td style="font-size: 13px; font-weight: bold"></td>	
+												<td style="font-size: 13px; font-weight: bold">
+												<label align="left" for="left" style="border:0; color:#0b5345; font-weight:bold; font-size: medium;">&nbsp;L</label>
+									<input type="text" id="left" style="border:0; color:#000000; font-weight:small; width:120px;" />
+									<input type="text" id="middle" style="border:0; color:#000000; font-weight:small; width:13px;" >|</input>	
+									<input type="text" id="left" style="border:0; color:#000000; font-weight:small; width:120px;" />
+									<label align="right" for="left" style="border:0; color: #78281f; font-weight:small; font-size: medium;"> &nbsp;R</label>
+												</td>
+											</tr>
+											<tr>
+												<td style="font-size: 16px; font-weight: bold">
+												Balance
+												</td>
+												<td style="font-size: 13px; font-weight: bold">
+												
+												<input id="bal_slide" name="bal_slide" type="text" data-slider="true" data-slider-range="-6,+6"  data-slider-step="1" data-slider-snap="true" value="{% if ldrdata['balance'] is equalto '0' %} {{ -1 * ldrdata['balValue']|int }} {% else %} {{ ldrdata['balValue']|int }} {% endif %}" />
+												</td>
+											</tr>
+											<tr>
+												<td style="font-size: 16px; font-weight: bold">
+												Volume
+												</td>
+												<td style="font-size: 13px; font-weight: bold">
+												<input id="vol_slide" name="vol_slide" type="text" data-slider="true" data-slider-range="1,{{ ldrdata['calibSteps']|safe }}" data-slider-step="1" onclick="set_Volume()" value=" {{ ldrdata['defVolume']|safe }}" />
+												</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								
+								<tr style="background-color:#f3f3f3"><td>&nbsp;</td></tr>
+							</tbody>
+						</table>
+						<input type="hidden" name="PVALUE" id="PVALUE" value="" />
+						<input type="hidden" name="submit_action" value="0" />
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="page-btns">
+				<a  class='btn-grey-wide-l' onclick='submitData()'><span>Update</span></a>
+				
+			</div>
+
+
+		</div>
+		<script>
+		
+		var ss = $sub('#bal_slide').val();
+		$sub('#bal_slide')
+		.each(function () {
+			var input = $sub(this);
+			$sub("<span>")
+	        	.addClass("output")
+	       		.insertAfter($sub(this));
+	    	})
+	    	.bind("slider:ready slider:changed", function (event, data) {
+		      	$sub(this)
+		        .nextAll(".output:first")
+		        .html(data.value.toFixed());
+		});
+	
+		var ss = $sub('#vol_slide').val();
+		$sub('#vol_slide')
+		.each(function () {
+		      var input = $sub(this);
+	     	      $sub("<span>")
+		      .addClass("output")
+	              .insertAfter($sub(this));
+	    	})
+	    	.bind("slider:ready slider:changed", function (event, data) {
+	      		$sub(this)
+		        .nextAll(".output:first")
+		        .html(data.value.toFixed());
+	    	});
+  		</script>
+	</body>
+	<script type="text/javascript">
+		
+	</script>
+</html>

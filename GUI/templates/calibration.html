@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="../static/js/jquery-1.8.2.min.js"></script>
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/validationEngine.jquery.css" />
+		<script src="../static/js/jquery.validationEngine-en.js"></script>
+		<script src="../static/js/jquery.validationEngine.js"></script>
+		<script type="text/javascript">
+			var $sub = $.noConflict(true);
+		</script>
+		<script type="text/javascript">
+			var cust_id = "{{ calibdata['pot']}}";
+			//var m_id = '<?php echo $mid ?>';
+			//var usb_type="No";
+			$sub(document).ready(function () {
+				if(cust_id == "Custom") {
+					$sub("#CUST_VAL").show();
+				}
+				refreshPage();
+				initValidation();			
+			});
+			
+			function initValidation() {
+					//alert("11111");
+				
+					$sub("#STPS").attr("data-validation-engine","validate[required,custom[onlyNumberSp]]");
+					
+					$sub("#calibconfig").validationEngine('attach', {promptPosition : "bottomRight"});
+			
+			}
+
+			function submitData() {
+				//alert("submit data");
+				if($sub("#calibconfig").validationEngine('validate')) {
+					
+					$sub("#CPVALUE").val($sub("#CPVALUE_f").val());
+					$sub("#CUST_VAL").val();
+					$sub("#STPS").val();
+					$sub("#STP_OPT").val();
+					
+					var formObj = document.forms[0];
+					formObj.submit_action.value = "1";
+					formObj.submit();
+				}
+			}
+
+			function start_calib() {
+				
+				//$sub("#HOST_TRACE").removeAttr("data-validation-engine");
+				
+				if($sub("#calibconfig").validationEngine('validate')) {
+				
+					var pot = $sub("#CPVALUE_f").val();
+					var impd= $sub("#CUST_VAL").val();
+					var steps = $sub("#STPS").val();
+					
+					//alert(impd);
+					//alert(steps);
+					parent.callCalibrationPage(pot, impd, steps, 'calibrationresult', 400, 700);
+					
+				}
+			}
+
+
+
+		/*	function start_calib() {
+				var imp_val = $sub("#CPVALUE_f").val();
+				//var temp = $sub("#CPVALUE").val($sub("#CPVALUE_f").val());
+				//var imp_val = temp;
+				var steps = $sub("#STPS").val();
+				alert(imp_val);
+				alert(steps);	
+				parent.showMessage();
+				//$("#OPT_FORWARD").html("");
+				//$("#list_option").show();
+				parent.$main.ajax({
+					url : "../View/system-calls.php?FTYPE=CALIBRATION&IMPEDANCE=" + imp_val + "&STEPS=" + steps
+				}).done(function(output) {
+					//alert(output);
+
+
+				//	parseXML(output, mode);
+					//fetch_forward_mobile_busy();
+				});
+			} */
+
+		/*	function start_calib() {
+				alert("11111111");
+				//$.ajax({
+				parent.$main.ajax({
+					url : "system-calls.php?FTYPE=CALIBRATION"
+				}).done(function(output) {
+					var arr = output.split("<RESULT>");
+					var progress = arr[0].split("<SUCCESS>");
+					var prg_per = progress[1];
+					if( progress[1] === undefined ) {
+						var progress = arr[0].split("<FAILED>");
+						//if( progress[1] === undefined ) {} else {
+						//	$("#PERCENT").css("color", "red");
+						//	$("#STATUS").css("color", "red");
+						//	$("#STATUS").html("Failed");
+						//	$("#stop-btn").hide();
+						//	$("#close-btn").show();
+						//}
+					} else {
+						if (progress[1].trim() == "30%") {
+							installDahdi();
+							called = 1;
+						}
+						
+						if (progress[1].trim() == "COMPLETED") {
+							prg_per = "100%";
+							$sub("#stop-btn").hide();
+							$sub("#close-btn").show();
+							$sub("#STATUS").html("Finished");
+						}
+					}
+					$sub("#PERCENT").html(prg_per);
+					$sub("#PROGRESS").css("width", prg_per);
+					$sub("#INSTALL_LOG").html(arr[1]);
+					$sub(".INSTALL_LOG").animate({ scrollTop: $sub("#INSTALL_LOG")[0].scrollHeight }, "fast");
+				});
+			}
+			*/
+
+			function setpot() {
+				var p_val = $sub("#CPVALUE_f").val();
+				if(p_val == "Custom") {
+					$sub("#CUST_VAL").show();
+				} else {
+					$sub("#CUST_VAL").hide();
+					if(p_val == "10")
+						$sub("#CUST_VAL").val(10);
+					if(p_val == "30")
+						$sub("#CUST_VAL").val(30);
+					if(p_val == "60")
+						$sub("#CUST_VAL").val(60);
+					if(p_val == "80")
+						$sub("#CUST_VAL").val(80);
+				}	
+			}
+
+
+
+			function refreshPage() {
+				var ref = "{{ calibdata['refresh'] }}";
+				if(ref == "1") {
+					parent.refreshFrame();
+				}
+			}
+
+
+		</script>
+	</head>
+	<body onclick="javascript: parent.hideMenu()">
+		<div class="content">
+			<h1>Calibration<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(0)" /></h1>
+			<div id="sipstatusbody" style="height: ; overflow-y: hidden; width: 95%; overflow-x: hidden">
+				<div id="page-content">
+					<div class="clear"></div>
+					<div class="vspacer12px"></div>
+					<div id="table-list">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0">
+							<tr>
+								<th width="760" class="btt" scope="col" style="font-size: 14px">Calibration</th>
+							</tr>
+						</table>
+						<form id="calibconfig" name="calibconfig" method="post" action="" autocomplete="off" onsubmit="return false">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+							<tbody>
+								<tr style="background-color:#f3f3f3" height="5"><td></td></tr>
+								<tr style="background-color:#f3f3f3">
+									<td>
+										<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+											<tr>
+												
+												<td>
+													<table width="100%" border="0" cellspacing="1" cellpadding="0" class="yui">
+														<tr style="font-size: small">
+														</tr>
+														<tr>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr style="background-color:#fff">
+									<td>
+										<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+											<tr>
+												<td style="font-size: 16px; font-weight: bold">
+										<label style="">
+										PoT Value &nbsp;&nbsp;&nbsp;&nbsp; </label> 										
+												</td>
+												<td style="font-size: 13px; font-weight: bold">
+												<select id="CPVALUE_f" name="CPVALUE_f" class="ipDrpBox" onchange="setpot()" onkeyup="setpot()" >
+									<option value="10" {{ "selected" if calibdata['pot'] == "10" }} >10</option>
+									<option value="30" {{ "selected" if calibdata['pot'] == "30" }} >30</option>
+									<option value="60" {{ "selected" if calibdata['pot'] == "60" }} >60</option>
+
+
+									<option value="80" {{ "selected" if calibdata['pot'] == "80" }} >80</option>
+									<option value="Custom" {{ "selected" if calibdata['pot'] == "Custom" }} >Custom</option>
+									</select>
+									<input maxlength="5" style="display:none" value="{{ calibdata['impedanceval'] }}" id="CUST_VAL" name="CUST_VAL" type="text" class="ipBox" />
+									&nbsp;<label style="font-size: 10px">Kohms &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT 25 &#x2103</label>
+
+												</td>
+											</tr>
+											
+											<tr>
+												<td style="font-size: 16px; font-weight: bold">
+										<label style="">
+										Number of Steps&nbsp;&nbsp;&nbsp;&nbsp; </label> 											
+												</td>
+												<td style="font-size: 13px; font-weight: bold">
+												<input type="text" maxlength="15" class="ipBox" id="STPS" name="STPS"  style="text-align: right;" value="{{ calibdata['calibsteps'] }}" />
+										&nbsp;<label style="font-size: 10px">default 48</label>
+												</td>
+											</tr>
+											<tr style="display:none">
+												<td style="font-size: 16px; font-weight: bold">
+										<label style="">
+										Manually Enter Steps &nbsp;&nbsp;&nbsp;&nbsp; </label> 									
+												</td>
+												<td style="font-size: 13px; font-weight: bold">
+												<select id="STP_OPT" name="STP_OPT" class="ipDrpBox" >
+									<option value="Yes" {{ "selected" if calibdata['customsteps'] == "Yes" }} >Yes</option>
+									<option value="No" {{ "selected" if calibdata['customsteps'] == "No" }} >No</option>
+
+									</select>
+									
+
+												</td>
+											</tr>
+											<tr> 
+											<td style="font-size: 13px; font-weight: bold">
+											</td>
+											<td id="gpio_40_td" style="font-size: small">
+								<!--		<a onclick="submitData()" style="margin-top: 0px" class="btn-grey-wide-l-2" ><span>Start</span></a>&nbsp;&nbsp;<a onclick="Save_values()" style="margin-top: 0px" class="btn-grey-wide-l-2" ><span>Save</span></a>-->
+											<a onclick="start_calib()" style="margin-top: 0px" class="btn-grey-wide-l-2" ><span>Start</span></a>
+											</td>
+											
+											</tr>
+
+
+										</table>
+									</td>
+								</tr>
+								
+								<tr style="background-color:#f3f3f3"><td>&nbsp;</td></tr>
+							</tbody>
+						</table>
+						<input type="hidden" name="CPVALUE" id="CPVALUE" value="" />
+						<input type="hidden" name="submit_action" value="0" />
+						</form>
+					</div>
+				</div>
+				<!--<div id="dialog-savedata" title="confirm">
+				<p id="confirmsavedata" style="display: none">
+					<img src="images/icn-reboot.png" style="float:left; margin:0 7px 20px 0; height: 50px;" />
+					<div id="confirmsavedata_div" style="font-size: 13px; margin-left: 10px; display: none">
+						Are you sure you want to save the data
+					</div>
+				</p>
+				</div>-->
+
+
+			</div>
+			<div class="page-btns">
+			<!--
+				<a class="btn-grey-wide-l" onclick="submitData(0)"><span>Save</span></a>
+				<a class="btn-grey-wide-l" onclick="submitData(1)"><span>Update Asterisk Details</span></a>
+			-->
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		
+	</script>
+</html>

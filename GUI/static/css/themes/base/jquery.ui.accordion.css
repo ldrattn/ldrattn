@@ -1,0 +1,153 @@
+/*!
+ * jQuery UI Accordion 1.10.3
+ * http://jqueryui.com
+ *
+ * Copyright 2013 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Accordion#theming
+ */
+.ui-accordion .ui-accordion-header {
+	display: block;
+	cursor: pointer;
+	position: relative;
+	/*margin-top: 2px;*/
+	padding: .5em .5em .5em .7em;
+	min-height: 0; /* support: IE7 */
+}
+.ui-accordion .ui-accordion-icons {
+	padding-left: 2.2em;
+}
+.ui-accordion .ui-accordion-noicons {
+	padding-left: .7em;
+}
+.ui-accordion .ui-accordion-icons .ui-accordion-icons {
+	padding-left: 2.2em;
+}
+.ui-accordion .ui-accordion-header .ui-accordion-header-icon {
+	position: absolute;
+	left: .5em;
+	top: 50%;
+	margin-top: -8px;
+}
+.ui-accordion .ui-accordion-content {
+	//padding: 1em 2.2em;
+	border-top: 0;
+	overflow: auto;
+}
+
+.tabsetup{
+	padding: 7px;
+	background-color: #081b46;
+	cursor: pointer;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-top-color: #224472;
+	border-bottom-color: #030918;
+	color: #DDD;
+}
+
+.tabsetupselected{
+	padding: 7px;
+	background-color: #f8f8f8;
+	cursor: pointer;
+	color: #444;
+}
+
+.tabsetup:hover{
+	padding: 7px;
+	background-color: #1b3165;
+	cursor: pointer;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-top-color: #375088;
+	border-bottom-color: #030918;
+}
+
+.subtabsetup_bg{
+	padding: 0px; 
+	
+}
+
+.subtabsetup{
+	background-color: #1f4089;
+	border-bottom: 1px solid #021d5a;
+	border-top: 1px solid #3154a4;
+	padding-right: 2px;
+	padding-left: 15px;
+	color:#7ca8c6;
+	padding-top: 5px;
+	padding-bottom: 4px;
+	cursor: pointer;
+}
+
+.subtabsetup:hover{
+	background-color: #10327e;
+	border-bottom: 1px solid #021d5a;
+	border-top: 1px solid #3154a4;
+	padding-right: 2px;
+	padding-left: 15px;
+	color:#FFFFFF;
+	padding-top: 5px;
+	padding-bottom: 4px;
+	cursor: pointer;
+}
+.subtabselected {
+	background-color: #ffffff;
+	padding-top: 5px;
+	padding-right: 2px;
+	padding-bottom: 4px;
+	padding-left: 15px;
+	color: #444;
+	cursor: pointer;
+}
+
+
+.tabdashboard{
+	padding: 5px; 
+	background-color: #EEEEEE; 
+	cursor: pointer;
+	color:#FFFFFF;
+}
+.orange_tab_main_container {
+	height: 30px;
+	width: 1024px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.time_display_tab {
+	float: left;
+	height: 30px;
+	width: 400px;
+	border-right-width: 2px;
+	border-right-style: solid;
+	border-right-color: #CC6600;
+}
+.center_message_tab {
+	float: left;
+	height: 30px;
+	width: 400px;
+	border-right-width: 2px;
+	border-left-width: 2px;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-right-color: #990000;
+	border-left-color: #FF00FF;
+}
+.right_tab_container {
+	float: right;
+	height: 30px;
+	width: 200px;
+	border-right-width: 2px;
+	border-left-width: 2px;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-right-color: #00CC00;
+	border-left-color: #6633CC;
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />		
+		<style type="text/css" title="currentStyle">
+			@import "../static/css/demo_page.css";
+			@import "../static/css/demo_table_jui.css";
+			@import "../static/css/jquery-ui-1.8.4.custom.css";
+			/*.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+				border: 1px solid #d3d3d3;
+				background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400-sub.png) 50% 50% repeat-x;
+				font-weight: normal;
+				color: #fff;
+			}
+			.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+				color: #fff;
+				text-decoration: none;
+			}*/
+		
+		</style>
+		<script src="../static/js/jquery.min.js"></script>
+		<script type="text/javascript" src="../static/js/jquery.dataTables.js"></script>
+		<script type="text/javascript">
+			
+			$(document).ready(function() {
+				var pot = "{{ calibinfo['pot'] }}"
+				if(pot == "Custom")
+					$("#PROXY").show();
+
+				oTable = $('#Treport').dataTable({
+					"sScrollY": 216,
+					"bJQueryUI" : true,
+					"sPaginationType" : "full_numbers",
+					"iDisplayLength": 10,
+					"aLengthMenu": [[5, 10, 20, 30, -1], [5, 10, 20, 30, "All"]],
+					"sDom": 'lfrtip' //shows on table with headers and data(i.e. without any header or footer)
+				});
+				
+				jQuery.fn.dataTableExt.oSort['html-undefined']  = function(a,b) {
+				    return false;
+				};
+				
+				$('.sorting_disabled').unbind('click');
+				$('.sorting_disabled span').remove();
+				
+				$("#siptrunks_paginate").click(function() {
+					$("input:checkbox").each(function() {
+						$(this).attr("checked", "");
+					});
+				});
+				
+				/* Data-tables End */
+				
+				var i = 0;
+				$("input:checkbox[name='chkbox']").each(function() {
+					i++;
+				});
+				if(i == 0) {
+					$("#checkall").attr("disabled", "disabled");
+				}
+				
+				$("#checkall").click(function() {
+					if ($("#checkall").is(":checked")) {
+						$("input[type='checkbox']").attr("checked", "checked");
+						$("#delete_selected").attr('class','btn-grey-wide-l');
+						$('#delete_selected').click(function() {
+							delete_data_all();
+						});
+					} else {
+						$("input[type='checkbox']").attr("checked", "");
+						$("#delete_selected").attr('class','btn-grey-wide-l-disabled');
+						$('#delete_selected').attr('onclick','').unbind('click');
+					}
+				});
+			});
+
+			
+
+
+			function load_potval(val) {
+				var formObj = document.forms[0];
+				formObj.submit_action.value = "1";
+				formObj.POT.value = val;
+				formObj.submit();
+			}
+
+			function setDisplay() {
+				var regtype_val = $("#PVALUE_f").val();
+				if(regtype_val == "Custom") {
+					$("#PROXY").show();
+				} else {
+					$("#PROXY").hide();
+					$("#PROXY").val();	
+				}	
+				load_potval(regtype_val);
+			}
+
+			function f1(val) {
+				/*if(val == 1) {
+					parent.closeAddEditDialog();
+					parent.document.getElementById("container").src = "sip-trunks.php";
+				}*/
+
+			}
+
+		</script>
+	</head>
+	<body onclick="javascript: parent.hideMenu()" onload="f1('<?php echo $res ?>')">
+		<div class="content">
+			<h1>Saved Values<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(2)" /></h1>
+
+
+			<tr style="background-color:#fff">
+				<td>
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+						<tr>
+							<td>&nbsp;&nbsp;</td>
+							<td style="font-size: 16px; font-weight: bold">
+							<label style="">
+							PoT Value &nbsp;&nbsp;&nbsp;&nbsp; </label> 								</td>
+							<td style="font-size: 13px; font-weight: bold">
+								<select id="PVALUE_f" name="PVALUE_f" class="ipDrpBox" onchange="setDisplay()" onkeyup="setDisplay()" >
+									<option value="10" {{ "selected" if calibinfo['pot'] == "10" }}>10</option>
+									<option value="30" {{ "selected" if calibinfo['pot'] == "30" }}>30</option>
+									<option value="60" {{ "selected" if calibinfo['pot'] == "60" }}>60</option>
+
+
+									<option value="80" {{ "selected" if calibinfo['pot'] == "70" }}>80</option>
+									<option value="Custom" {{ "selected" if calibinfo['pot'] == "Custom" }}>Custom</option>
+								</select>
+								<input maxlength="5" style="display:none" value="{{ calibinfo['impedanceval']}}" id="PROXY" name="PROXY" type="text" disabled class="ipBox-disabled" />
+								&nbsp;<label style="font-size: 10px">Kohms &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT {{calibinfo['temp_calib']}} &#x2103</label>
+                     					</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+																			
+		
+
+
+			<div id="siptrunksbody" style="height: ; overflow-y: hidden; width: 95%; overflow-x: hidden">
+				<div id="dt_example">
+				<div id="container" style="font-size: 13px">
+				<div class="demo_jui" style="box-shadow: 5px 5px 5px #aaa">
+					<table border="0" cellpadding="0" cellspacing="0" style="margin: 0px" class="table-config no-border">
+					<table cellpadding="0" cellspacing="0" border="0" class="display" id="Treport">
+						<thead>
+							<tr>
+								<!--
+								<th class="sorting_disabled"><input type="checkbox" id="checkall" align="center" /></th>-->
+								<!--<th><a href="#">S.No</a></th>-->
+								<th><a href="#">Steps</a></th>
+								<th><a href="#">Shunt Resistance</a></th>
+								<th><a href="#">Series Resistance</a></th>
+								<th><a href="#">R_ADC Series</a></th>
+								<th><a href="#">R_ADC Shunt</a></th>
+								<th><a href="#">R_DAC Series</a></th>
+								<th><a href="#">R_DAC Shunt</a></th>
+								<th><a href="#">L_ADC Series</a></th>
+								<th><a href="#">L_ADC Shunt</a></th>
+								<th><a href="#">L_DAC Series</a></th>
+								<th><a href="#">L_DAC Shunt</a></th>
+								
+							</tr>
+						</thead>
+						<tbody>
+							{%- for idx in range(saveddata|length) -%}
+							 <tr>
+								<td>{{idx}}</td>
+								<td>{{saveddata[idx][0]}}</td>
+								<td>{{saveddata[idx][1]}}</td>
+								<td>{{saveddata[idx][2]}}</td>
+								<td>{{saveddata[idx][3]}}</td>
+								<td>{{saveddata[idx][4]}}</td>
+								<td>{{saveddata[idx][5]}}</td>
+								<td>{{saveddata[idx][6]}}</td>
+								<td>{{saveddata[idx][7]}}</td>
+								<td>{{saveddata[idx][8]}}</td>
+								<td>{{saveddata[idx][9]}}</td>
+							       </tr>
+							{%- endfor -%}
+						</tbody>
+					</table>
+				</table>
+				</div>
+				</div>
+				</div>
+				<div style="height: 10px">&nbsp;</div>
+			</div>
+			<div class="page-btns">
+			<!--	<a  class='btn-grey-wide-l' onclick='report_data(1)'><span>Serial & Mac CSV Report</span></a>
+				<a  class='btn-grey-wide-l' onclick='report_data(2)'><span>Serial & Mac Test CSV Report</span></a>
+				<a  class='btn-grey-wide-l' onclick='report_data(3)'><span>Complete Text Report</span></a>
+				<a class='btn-grey-wide-l' onclick='del_data()'><span>Delete All</span></a>-->
+			</div>
+		</div>
+		<form id="ldrsavedform" method="GET" action="">
+			<input type="hidden" name="submit_action" value="0" />
+			<input type="hidden" name="POT" id="POT" value="" />
+		</form>
+	</body>
+	<script type="text/javascript">
+		parent.setUpdateValue('<?php echo $update_count ?>');
+	</script>
+</html>

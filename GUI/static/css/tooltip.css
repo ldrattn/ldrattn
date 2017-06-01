@@ -1,0 +1,49 @@
+.ttip{      
+            
+        visibility:hidden;   
+        /*display:none;*/        
+} 
+   
+#tooltip {
+
+	position: absolute;
+	z-index: 3000;
+	background: #FFF9C2;
+	border: solid 2px #FFCC34;
+	color: #a48016;
+	font-weight: normal;
+	padding: 4px 8px;
+	width: auto;
+	max-width: 200px;
+	font-size: 10px;
+	opacity: 0.87;
+	border-radius: 6px 6px 6px 6px;
+	box-shadow: 0 0 6px #000;
+
+
+}
+
+#note {
+	z-index: 3000;
+	background: #FFF9C2;
+	border: solid 2px #FFCC34;
+	color: #a48016;
+	font-weight: normal;
+	padding: 8px 12px;
+	font-size: 13px;
+	opacity: 1;
+	border-radius: 6px 6px 6px 6px;
+	box-shadow: 5px 5px 5px #aaa;
+}
+
+#tooltip h3, #tooltip div {
+	margin: 0;
+	font-weight: normal;
+	line-height: 14px;
+
+}
+#tooltip h3 {
+	margin: 0;
+	padding: 0;
+}
+
