@@ -18,7 +18,9 @@
 
 static void printCalibData();
 static void readLDRConfig();
-static int cmdParser(char *clientcmd);
+static int cmdParser(char *clientcmd,int sockfd);
+static void startCalibrationThread(unsigned int ,int ,int);
+static void stopCorrectionThread(void);
 static void startCorrectionThread(void);
 static void stopCorrectionThread(void);
 
@@ -35,10 +37,15 @@ unsigned int curImpedance; //curImpedance will be changed based on the callibrar
 			    //customer may do calibrartion for different impedance 	
 
 struct volumeattr attr;
+struct calibattr calibdata;
+int pipefd[2];
+
 Calibstate State;
 	
 pthread_t deltaThread;
+pthread_t calibThread;
 void deltaCorrection(struct volumeattr *);
+int doCalibration(struct calibattr *);
 
 static void printCalibData()
 {
@@ -81,6 +88,7 @@ static void readLDRConfig()
 		//we are check for file size null. csv format cheking should be done on GUI side while
 		//uploading .
 		debugLog(LOG_INFO, "Failed to Read Calibrated Data Maybe calibrration not done\n");
+		setMute();
 		State = NOTCALIBRATED;
 	}
 }
@@ -100,6 +108,37 @@ static void startCorrectionThread()
 	}
 }
 
+static void startCalibrationThread(unsigned int impedance,int numsteps,int volume)
+{
+	int ret;
+
+	memset(&calibdata,0,sizeof(calibdata));
+	calibdata.impedance = impedance;
+	calibdata.numsteps = numsteps;
+	calibdata.volume = volume;
+	calibdata.status = CALIB_START;
+	calibdata.pipefd = pipefd[1];
+	calibdata.shstep = 0;
+	calibdata.sestep = 0;
+
+	ret = pthread_create(&calibThread,NULL,(void *)doCalibration,(void *)&calibdata);
+	//pthread_join(calibThread,(void *)&ret);		
+
+	if(ret == 0) {
+		LOG_TRACE(LOG_INFO,"Calibrartion thread created\n");
+		//State = CALIBRATED;	
+		//curImpedance = argvalue;
+		//curVolume = ldrconf.volume;
+		//startCorrectionThread();		
+
+	} else {
+		LOG_TRACE(LOG_INFO,"Failed  to create the calibration thread \n");
+		//State = NOTCALIBRATED;	
+		calibdata.status = CALIB_FAILED;
+		//todo what to do if it fails to create the thread
+	} 
+}
+
 static void stopCorrectionThread()
 {
 	int ret;
@@ -109,10 +148,20 @@ static void stopCorrectionThread()
 		LOG_TRACE(LOG_INFO,"Failed to Cancel Delta correction thread\n");
 }
 
-static int cmdParser(char *clientcmd)
+static void stopCalibrationThread()
+{
+	int ret;
+
+	ret = pthread_cancel(calibThread);
+ 	if(ret)
+		LOG_TRACE(LOG_INFO,"Failed to Cancel Calibration thread\n");
+}
+
+static int cmdParser(char *clientcmd,int sockfd)
 {
 	unsigned int argvalue;	
 	unsigned int calibsteps;
+	char respbuf[MAXLEN];
 
 	if(!strlen(clientcmd))
 		return EXIT_FAILURE;
@@ -125,7 +174,7 @@ static int cmdParser(char *clientcmd)
 	}
 
 	argcnt = 0;
-	if(!strncmp(argc[argcnt],"START_CALIB",strlen(argc[argcnt]))) { 
+	if(!strncmp(argc[argcnt],"CALIB_START",strlen(argc[argcnt]))) { 
 		//Todo call stop calibration
 		//stop thread
 		stopCorrectionThread();
@@ -145,7 +194,10 @@ static int cmdParser(char *clientcmd)
 		ldrconf.calibSteps = calibsteps;
 		//Todo de we need to set the volume to default volume or current volume after calibration	
 		stopCorrectionThread();
+		startCalibrationThread(argvalue,calibsteps,ldrconf.volume);
+#if 0
 		if(!doCalibration(argvalue,calibsteps,ldrconf.volume)) {
+		if(!startCalibration(argvalue,calibsteps,ldrconf.volume)) {
 			State = CALIBRATED;	
 			curImpedance = argvalue;
 			curVolume = ldrconf.volume;
@@ -154,8 +206,11 @@ static int cmdParser(char *clientcmd)
 			State = NOTCALIBRATED;	
 
 		}
-	} else if(!strncmp(argc[argcnt],"STOP_CALIB",strlen(argc[argcnt]))) {
+#endif 
+	} else if(!strncmp(argc[argcnt],"CALIB_STOP",strlen(argc[argcnt]))) {
 		//Todo how to stop calibration
+		stopCalibrationThread();
+		startCorrectionThread();		
 	
 	} else if(!strncmp(argc[argcnt],"SET_VOLUME",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		stopCorrectionThread();
@@ -164,21 +219,24 @@ static int cmdParser(char *clientcmd)
 		attr.balanceValue = 0;
 		setVolume(argvalue);
 		curVolume = argvalue;
-	//	if(curVolume != 0) {
+		if((curVolume != 0) &&  (curVolume < (ldrconf.calibSteps - 1))) {
 		startCorrectionThread();		
-	//	}
+		}
 		//set volume
 	} else if(!strncmp(argc[argcnt],"RELOAD_CONFIG",strlen(argc[argcnt]))) {
 		memset(&ldrattn,0,sizeof(ldrattn));
+		setMute();
 		readLDRConfig();
 		State = NOTCALIBRATED;	
 		//reload config
 
-	} else if(!strncmp(argc[argcnt],"SAVE_CALIB",strlen(argc[argcnt])) && (State == CALIBRATED)) {
-		if(saveCalibration(curImpedance,ldrconf.calibSteps) == EXIT_FAILURE) {
+	} else if(!strncmp(argc[argcnt],"CALIB_SAVE",strlen(argc[argcnt])) && (State == CALIBRATED)) {
+		if(saveCalibration(calibdata.impedance,calibdata.numsteps) == EXIT_FAILURE) {
+		//if(saveCalibration(curImpedance,ldrconf.calibSteps) == EXIT_FAILURE) //{
 			debugLog(LOG_INFO, "Failed to Save Calibrated Data \n");
-		}  
-			 
+		} else {  
+			memset(&calibdata,0,sizeof(calibdata));
+		}		 
 		//save calibration
 
 	} else if(!strncmp(argc[argcnt],"WRITE_CONFIG",strlen(argc[argcnt]))) {
@@ -199,6 +257,17 @@ static int cmdParser(char *clientcmd)
 	} else if(!strncmp(argc[argcnt],"TEMP_COMPENSATE",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		//Todo do the DAC correction based on the previous values
 		argvalue = atoi(argc[++argcnt]);
+
+	} else if(!strncmp(argc[argcnt],"MUTE_VOLUME",strlen(argc[argcnt]))) {
+		LOG_TRACE(LOG_INFO," Mute volume from client\n");		 			
+		stopCorrectionThread();
+		setMute();
+		 
+	} else if(!strncmp(argc[argcnt],"CALIB_STATUS",strlen(argc[argcnt]))) {
+		LOG_TRACE(LOG_INFO,"Calib Status from client\n");
+		snprintf(respbuf,MAXLEN,"%d,%d,%d,%d,%d",calibdata.impedance,calibdata.numsteps,calibdata.status,calibdata.sestep,calibdata.shstep);
+		printf("calibstatus is %s\n",respbuf);
+		send(sockfd,respbuf,strlen(respbuf),0);		 			
 		 
 	} else {
 		LOG_TRACE(LOG_INFO,"  Invalid command received from clieint\n");		 			
@@ -214,7 +283,10 @@ int main()
 	unsigned int Sock, LDRSock;
 	struct sockaddr_un Local, Remote;
 	socklen_t Len;
-	char cmd[CMDLEN];
+	char Cmd[CMDLEN];
+	fd_set Readfds;
+	int Maxfds;
+	char IPCdata;
 
 	State = NOTCALIBRATED;
 
@@ -224,8 +296,17 @@ int main()
 		LOG_TRACE(LOG_INFO,"  Failed to initialise the I2C transaction \n");
 		exit(1);
 	}
+	if(!testSetup()) {
+		LOG_TRACE(LOG_INFO,"  Failed to initialise the ADC/DAC  transaction \n");
+		exit(1);
+
+	}
 	readLDRConfig();
 	
+	if(pipe(pipefd) < 0) {
+		LOG_TRACE(LOG_INFO,"  Failed to create pipe fd for IPC \n");
+		exit(1);		
+	}
 			
 	if ((Sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		perror("socket");
@@ -247,17 +328,39 @@ int main()
 	}
 	
 	for(;;) {
-		printf("Waiting for a connection...\n");
-		Len = sizeof(Remote);
-		if ((LDRSock = accept(Sock, (struct sockaddr *)&Remote, &Len)) == -1) {
-			perror("accept");
-			exit(1);
-		}	
-		recv(LDRSock, cmd, 80, 0);
-		printf("the command received is %s \n",cmd);
-		cmdParser(cmd);
-		printf("Connected. %s\n",cmd);
-		close(LDRSock);
+	
+		FD_ZERO(&Readfds);
+		FD_SET(Sock,&Readfds);
+		Maxfds = Sock;
+	
+		if(pipefd[0] > 0) {
+			FD_SET(pipefd[0],&Readfds);
+		}
+			
+		if( pipefd[0] > Maxfds) {
+			Maxfds = pipefd[0];	
+		}
+		
+		printf("Waiting for a connection... %d %d %d\n",Sock,pipefd[0],Maxfds);
+		select(Maxfds+1, &Readfds, NULL, NULL, NULL);	
+		if(FD_ISSET(Sock,&Readfds)) {
+			Len = sizeof(Remote);
+			if ((LDRSock = accept(Sock, (struct sockaddr *)&Remote, &Len)) == -1) {
+				perror("accept");
+				exit(1);
+			}	
+			recv(LDRSock, Cmd, 80, 0);
+			printf("the command received is %s \n",Cmd);
+			cmdParser(Cmd,LDRSock);
+			printf("Connected. %s\n",Cmd);
+			close(LDRSock);
+		} 
+		if(FD_ISSET(pipefd[0],&Readfds)) {
+			read(pipefd[0],&IPCdata,1);
+			printf("starting correction thread \n");
+			startCorrectionThread();		
+		} 
+		
 	}
 
 	close(LDRSock);

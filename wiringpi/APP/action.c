@@ -24,6 +24,7 @@
 #include "ltc2655.h"
 
 LDRAttr ldrattn;
+LDRAttr ldrattn_t;
 
 int LDRfd;
 
@@ -101,7 +102,7 @@ void setRSH_Range(int val)
 }
 
 /******* get attenuation factor from step number, LOG law *******/
-float getAttFromStep(int step) {
+float getAttFromStep(float step) {
 	float p ; //= step / (float)(VOL_MAX_STEP);
 	p = step; 
 	float tmpatt = pow(10,(-(p/20)));
@@ -117,6 +118,7 @@ unsigned long getResistance(int  measure_raw, int seriesLDRres, int refResistor)
 	else {
 		float v = (float) measure / 1000;
 		float result = ((v * refResistor) / (LDR_VOLTAGE - v)) - seriesLDRres;
+	//	printf("measure_rwa %d  %f %d \n",measure_raw,((v * refResistor) / (LDR_VOLTAGE - v)),seriesLDRres);	
 		return (int long)(result);
 	}
 }
@@ -352,6 +354,7 @@ static int doSelfTest()
 	// test series LDRs max val
 	setLSE_Range(HIGH); setRSE_Range(HIGH); setLSE(0); setRSE(0);
 	setLSH_Range(LOW); setRSH_Range(LOW); setLSH(65535); setRSH(65535); //set shunt R to minimum
+	sleep(1);
 #if 0
 	val = getRLSE();
 	if (val < LDR_ZERO_MIN) {
@@ -359,14 +362,16 @@ static int doSelfTest()
 	}
 #endif
 	val = getRRSE();
+		printf("---- RSE va is %d  \n",val);
 	if (val < LDR_ZERO_MIN) {
-		//printf("---- va is %d \n",val);
+		printf("---- RSE va is %d \n",val);
 		return 1;
 	}
 
 	// test shunt LDRs max val
 	setLSE_Range(LOW); setRSE_Range(LOW); setLSE(65535); setRSE(65535); //set series R to minimum
 	setLSH_Range(HIGH); setRSH_Range(HIGH); setLSH(0); setRSH(0);
+	sleep(1);
 #if 0
 	val = getRLSH();
 	if (val < LDR_ZERO_MIN) {
@@ -374,17 +379,28 @@ static int doSelfTest()
 	}
 #endif
 	val = getRRSH();
+		printf(" RSH va is %d \n",val);
 	if (val < LDR_ZERO_MIN) {
-		//printf(" va is %d \n",val);
+		printf(" RSH va is %d \n",val);
 		return 1;
 	}
 
+	setRSE(20000);
+	setRSH(65535);
+	sleep(1);
+	printf("resi %d\n",getRRSE());
+	
+	setRSE(65535);
+	setRSH(65535);
+	sleep(1);
+	printf("resi  high %d\n",getRRSE());
 	return 0;
 }
 
-void setMute(int volume)
+void setMute()
 {
 
+	LOG_TRACE(LOG_INFO,"Volume set to Mute ------------\n ");
 	setLSE(0); setRSE(0); setLSH(65535); setRSH(65535);
 	sleep(1);		
 }
@@ -448,7 +464,7 @@ int saveCalibration(unsigned int impedance,unsigned int steps)
 	char csvfile[MAXLEN];
 	
 	getCSVFilename(impedance,csvfile);
-	if( writeCalibData(csvfile,steps) == EXIT_FAILURE) {
+	if( writeCalibData(csvfile,steps,ldrattn_t) == EXIT_FAILURE) {
 		return EXIT_FAILURE;
 	} else {
 		return EXIT_SUCCESS;
@@ -481,6 +497,44 @@ int  initWiringPiDevices()
 
 }
 
+int testSetup()
+{
+
+	unsigned long val;
+
+	setLSE(0); setRSE(0);
+	setLSH(65535); setRSH(65535); //set shunt R to minimum
+	sleep(1);
+#if 0
+	val = getRLSE();
+	if (val < LDR_ZERO_MIN) {
+		return 1;
+	}
+#endif
+	val = getIRSE();
+	printf("----  IRSE val is %d \n",val);
+	val = getIRSH();
+	printf("----  IRSH val is %d \n",val);
+
+	// test shunt LDRs max val
+	setLSE(65535); setRSE(65535); //set series R to minimum
+	setLSH(0); setRSH(0);
+	sleep(1);
+#if 0
+	val = getRLSH();
+	if (val < LDR_ZERO_MIN) {
+		return 1;
+	}
+#endif
+	val = getIRSE();
+	printf(" IRSE val is %d \n",val);
+	val = getIRSH();
+	printf(" IRSH val is %d \n",val);
+
+	return 1;
+
+
+}
 
 void storeMaxVolume(impedance,numsteps)
 {
@@ -505,8 +559,14 @@ void storeZeroVolume(unsigned int impedance)
 }
 
 
-int doCalibration(unsigned int impedance,int numsteps,int volume) {
+void * doCalibration(struct calibattr *calibdata) {
+//int doCalibration(unsigned int impedance,int numsteps,int volume) {
+	unsigned int impedance;
+	int numsteps;
+	int volume;
+	int fd;
 
+	
 	//** local vars
 	float att;
 	unsigned long LSE_target, LSH_target, RSE_target, RSH_target, targetL0, targetR0;
@@ -520,18 +580,33 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 	unsigned int nojumpL, nojumpR = FALSE;
 	unsigned int step = 0; 
 	int percent = 0;
-
+	
 	//int i;
 	unsigned long LSH_Min_Hi = 0 ;
 	unsigned long RSH_Min_Hi = 0 ;
 	unsigned long LSE_Min_Hi = 0 ;
 	unsigned long RSE_Min_Hi = 0 ;
-	printf("HERE %s:%d\n", __func__, __LINE__);
-#if 0
+	char ipcdata = 'A';
+	impedance = calibdata->impedance;	
+	numsteps = calibdata->numsteps;
+	volume = calibdata->volume;	
+	fd = calibdata->pipefd;
+	printf("HERE %s:%d fd %d  %d  %d \n", __func__, __LINE__,fd,impedance,numsteps);
+	calibdata->status = CALIB_FAILED;
+	calibdata->sestep = 0;
+	calibdata->shstep = 0;
+
+
+	//testSetup();
+	//exit(1);
+#if 1
 	int errc = doSelfTest();
 	printf("HERE %s:%d\n", __func__, __LINE__);
-	if (errc != 0)
-		return errc;
+	if (errc != 0) {
+		write(fd,&ipcdata,1);	
+		calibdata->status = CALIB_FAILED; 
+		return (void *)errc;
+	}
 
 #endif
 	printf("HERE %s:%d\n", __func__, __LINE__);
@@ -555,11 +630,11 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 	setLSE_Range(HIGH); setRSE_Range(HIGH); setLSE(0); setRSE(0);
 	setLSH_Range(LOW); setRSH_Range(LOW); setLSH(65535); setRSH(65535);
 
-	memset(&ldrattn,0,sizeof(ldrattn));
-	ldrattn.potImpedence = impedance;
-	ldrattn.calibSteps = numsteps;
+	memset(&ldrattn_t,0,sizeof(ldrattn_t));
+	ldrattn_t.potImpedence = impedance;
+	ldrattn_t.calibSteps = numsteps;
+
 	//loop for each volume sample needed
-#if 1
 	int fp = open(LOCK_FILE, O_CREAT);
 	if(fp == -1) {
 		LOG_TRACE(LOG_INFO,"unable  to create the lock file");
@@ -568,13 +643,17 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 	}	
 	debugLog(LOG_INFO,"Calibration started\n");
 		
-	for (step = 1 ; step < (numsteps-1) ; step++) { //step=0 is mute step=calib=max
+#if 1
+	for (step = 1 ; step < (numsteps) ; step++) { //step=0 is mute step=calib=max
 		
 		int dbstep = numsteps-step; //db value for the step
 		
-		int dbperstep = DBMAX/(numsteps-2);
+		calibdata->status = CALIB_ONGOING;
+		calibdata->sestep = step;
+		float dbperstep = (float)DBMAX/(numsteps-1);
 		//** calculate attenuation needed
-		att = getAttFromStep(dbperstep*dbstep);
+		att = getAttFromStep((float)(dbperstep*dbstep));
+		printf(" att %f dbstep %d dbperstep %f \n",att,dbstep, dbperstep);
 		//** calculate target R values
 		//LSE_target = RSE_target = getRxFromAttAndImp(att, NOM_IMPEDANCE);
 		//LSH_target = RSH_target = getRyFromAttAndImp(att, NOM_IMPEDANCE);
@@ -584,8 +663,8 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 		LSH_target = LOAD_IMPEDANCE * LSH_target / (LOAD_IMPEDANCE - LSH_target);
 		RSH_target = LOAD_IMPEDANCE * RSH_target / (LOAD_IMPEDANCE - RSH_target);
 		
-		ldrattn.targetres[step].series = RSE_target;
-		ldrattn.targetres[step].shunt= RSH_target;
+		ldrattn_t.targetres[step].series = RSE_target;
+		ldrattn_t.targetres[step].shunt= RSH_target;
 #if 0
 		printf("---Step:%d DB:%d Attn:%f LSE_target:%d LSH_target:%d RSE_target:%d RSH_target:%d \n", i, db, att, LSE_target, LSH_target, RSE_target, RSH_target);
 		//** adjust values if out of attainable range
@@ -611,7 +690,7 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 
 
 #endif
-		printf("Step:%d DB:%d Attn:%f LSE_target:%d LSH_target:%d RSE_target:%d RSH_target:%d \n", step, (dbperstep * dbstep), att, LSE_target, LSH_target, RSE_target, RSH_target);
+		printf("Step:%d DB:%f Attn:%f LSE_target:%d LSH_target:%d RSE_target:%d RSH_target:%d \n", step, (dbperstep * dbstep), att, LSE_target, LSH_target, RSE_target, RSH_target);
 		//** find LDR current for the target resistances calculated above
 		foundL = foundR = false;
 #if 1
@@ -647,13 +726,13 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 				else {
 					foundL = TRUE;
 					if (rL0 - LSE_target >= LSE_target - rL1) {
-						ldrattn.dataL[step].pw_SE = pwL1;
-						ldrattn.dataL[step].i_SE = iL1;
+						ldrattn_t.dataL[step].pw_SE = pwL1;
+						ldrattn_t.dataL[step].i_SE = iL1;
 					}
 					else
 					{
-						ldrattn.dataL[step].pw_SE = pwL0;
-						ldrattn.dataL[step].i_SE = iL0;
+						ldrattn_t.dataL[step].pw_SE = pwL0;
+						ldrattn_t.dataL[step].i_SE = iL0;
 					}
 					//printf("\n Got values left dac :%ld for R:%ld", dataL[i].pw_SE, LSE_target);
 				}
@@ -662,6 +741,8 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 			if (!foundL && !reloopL)
 			{
 				if (pwL1 == MAX_LDR_INPUT) {
+					write(fd,&ipcdata,1);	
+					calibdata->status = CALIB_FAILED; 
 					return 1;
 				}
 
@@ -694,13 +775,13 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 				else {
 					foundR = TRUE;
 					if (rR0 - RSE_target >= RSE_target - rR1) {
-						ldrattn.dataR[step].pw_SE = pwR1;
-						ldrattn.dataR[step].i_SE = iR1;
+						ldrattn_t.dataR[step].pw_SE = pwR1;
+						ldrattn_t.dataR[step].i_SE = iR1;
 					}
 					else
 					{
-						ldrattn.dataR[step].pw_SE = pwR0;
-						ldrattn.dataR[step].i_SE = iR0;
+						ldrattn_t.dataR[step].pw_SE = pwR0;
+						ldrattn_t.dataR[step].i_SE = iR0;
 					}
 					//printf("\n Got values right dac :%ld for R:%ld\n", dataR[i].pw_SE, RSE_target);
 
@@ -715,6 +796,8 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 			if (!foundR && !reloopR)
 			{
 				if (pwR1 == MAX_LDR_INPUT) {
+					write(fd,&ipcdata,1);	
+					calibdata->status = CALIB_FAILED; 
 					return 2;
 				}
 
@@ -741,12 +824,12 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 
 		} while (!foundL || !foundR);
 
-		printf("Step:%02d DB:%02d Attn:%f dataL.pw_SE:%ld dataL.i_SE:%ld for LSE_target:%04d LSH_target:%04d",  step, (dbperstep * dbstep), att , ldrattn.dataL[step].pw_SE,ldrattn.dataL[step].i_SE, LSE_target, LSH_target);
-		printf(" --- dataR.pw_SE:%ld dataR.i_SE:%ld for RSE_target:%04d RSH_target:%04d\n", ldrattn.dataR[step].pw_SE,ldrattn.dataR[step].i_SE, RSE_target, RSH_target);
+		printf("Step:%02d DB:%f Attn:%f dataL.pw_SE:%ld dataL.i_SE:%ld for LSE_target:%04d LSH_target:%04d",  step, (dbperstep * dbstep), att , ldrattn_t.dataL[step].pw_SE,ldrattn_t.dataL[step].i_SE, LSE_target, LSH_target);
+		printf(" --- dataR.pw_SE:%ld dataR.i_SE:%ld for RSE_target:%04d RSH_target:%04d\n", ldrattn_t.dataR[step].pw_SE,ldrattn_t.dataR[step].i_SE, RSE_target, RSH_target);
 
-		debugLog(LOG_INFO, "RLSE %05d ILSE %05d RRSE %05d IRSE %05d TargetSE %05d TargetSH %05d\n ",ldrattn.dataL[step].pw_SE,ldrattn.dataL[step].i_SE,ldrattn.dataR[step].pw_SE,ldrattn.dataR[step].i_SE,RSE_target, RSH_target );
-		debugLog(LOG_INFO, "RLSE %05d ILSE %05d ",ldrattn.dataL[step].pw_SE,ldrattn.dataL[step].i_SE);
-		debugLog(LOG_INFO, "RRSE %05d IRSE %05d ",ldrattn.dataR[step].pw_SE,ldrattn.dataR[step].i_SE);
+		debugLog(LOG_INFO, "RLSE %05d ILSE %05d RRSE %05d IRSE %05d TargetSE %05d TargetSH %05d\n ",ldrattn_t.dataL[step].pw_SE,ldrattn_t.dataL[step].i_SE,ldrattn_t.dataR[step].pw_SE,ldrattn_t.dataR[step].i_SE,RSE_target, RSH_target );
+		debugLog(LOG_INFO, "RLSE %05d ILSE %05d ",ldrattn_t.dataL[step].pw_SE,ldrattn_t.dataL[step].i_SE);
+		debugLog(LOG_INFO, "RRSE %05d IRSE %05d ",ldrattn_t.dataR[step].pw_SE,ldrattn_t.dataR[step].i_SE);
 		debugLog(LOG_INFO, "TargetSE %05d TargetSH %05d\n",RSE_target, RSH_target);
 
 	} //end for series
@@ -767,12 +850,13 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 
 	system("date >> /tmp/o");
 	//loop for each volume sample needed
-	for (step = 1; step < (numsteps-1) ; step++) {
+	for (step = 1; step < (numsteps) ; step++) {
 		//byte step = i+2;
 		
 		int dbstep = numsteps-step; //db value for the step
 
-		int dbperstep = DBMAX/(numsteps-2);
+		calibdata->shstep = step;
+		float  dbperstep =(float) DBMAX/(numsteps-1);
 
 		//db = i+1;
 		//** calculate target R values
@@ -843,13 +927,13 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 
 		// already found the value?
 		if (targetL0 == LSH_target) {
-			ldrattn.dataL[step].pw_SH = ldrattn.dataL[step - 1].pw_SH;
-			ldrattn.dataL[step].i_SH = ldrattn.dataL[step - 1].i_SH;
+			ldrattn_t.dataL[step].pw_SH = ldrattn_t.dataL[step - 1].pw_SH;
+			ldrattn_t.dataL[step].i_SH = ldrattn_t.dataL[step - 1].i_SH;
 			foundL = true;
 		}
 		if (targetR0 == RSH_target) {
-			ldrattn.dataR[step].pw_SH = ldrattn.dataR[step - 1].pw_SH;
-			ldrattn.dataR[step].i_SH = ldrattn.dataR[step - 1].i_SH;
+			ldrattn_t.dataR[step].pw_SH = ldrattn_t.dataR[step - 1].pw_SH;
+			ldrattn_t.dataR[step].i_SH = ldrattn_t.dataR[step - 1].i_SH;
 			//PRINT("> Copy RSH i="); PRINT(dataL[i].i_SH); PRINTLN();
 			foundR = true;
 		}
@@ -883,21 +967,23 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 				else {
 					foundL = true;
 					if (LSH_target - rL0 < rL1 - LSH_target) {
-						ldrattn.dataL[step].pw_SH = pwL0;
-						ldrattn.dataL[step].i_SH = iL0;
+						ldrattn_t.dataL[step].pw_SH = pwL0;
+						ldrattn_t.dataL[step].i_SH = iL0;
 					}
 					else {
-						ldrattn.dataL[step].pw_SH = pwL1;
-						ldrattn.dataL[step].i_SH = iL1;
+						ldrattn_t.dataL[step].pw_SH = pwL1;
+						ldrattn_t.dataL[step].i_SH = iL1;
 					}
 					targetL0 = LSH_target;
 					if (rangeL == LOW)
-						ldrattn.dataL[step].i_SH= ldrattn.dataL[step].i_SH | 32768; //bit15 == 1 means LOW R range
+						ldrattn_t.dataL[step].i_SH= ldrattn_t.dataL[step].i_SH | 32768; //bit15 == 1 means LOW R range
 				}
 			}
 
 			if (!foundL && !reloopL) {
 				if (pwL1 == 0) {
+					write(fd,&ipcdata,1);	
+					calibdata->status = CALIB_FAILED; 
 					return 3;
 				}
 
@@ -935,21 +1021,23 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 					foundR = true;
 					//if (RSH_target - rR0 < rR1 - RSH_target) //{
 					if (RSH_target - rR0 < rR1 - RSH_target) {
-						ldrattn.dataR[step].pw_SH = pwR0;
-						ldrattn.dataR[step].i_SH = iR0;
+						ldrattn_t.dataR[step].pw_SH = pwR0;
+						ldrattn_t.dataR[step].i_SH = iR0;
 					}
 					else {
-						ldrattn.dataR[step].pw_SH = pwR1;
-						ldrattn.dataR[step].i_SH = iR1;
+						ldrattn_t.dataR[step].pw_SH = pwR1;
+						ldrattn_t.dataR[step].i_SH = iR1;
 					}
 					targetR0 = RSH_target;
 					if (rangeR == LOW)
-						ldrattn.dataR[step].i_SH = ldrattn.dataR[step].i_SH | 32768;
+						ldrattn_t.dataR[step].i_SH = ldrattn_t.dataR[step].i_SH | 32768;
 				}
 			}
 
 			if (!foundR && !reloopR) {
 				if (pwR1 == 0) {
+					write(fd,&ipcdata,1);	
+					calibdata->status = CALIB_FAILED; 
 					return 4;
 				}
 
@@ -991,14 +1079,14 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 			}
 
 		} while (!foundL || !foundR);
-		printf("Step:%02d DB:%02d Attn:%f dataL.pw_SH:%ld dataL.i_SH:%ld for LSE_target:%04d LSH_target:%04d time%ld ", step, (dbperstep * dbstep), att , ldrattn.dataL[step].pw_SH,ldrattn.dataL[step].i_SH, LSE_target, LSH_target,time(0));
-		printf("Step:%02d DB:%02d Attn:%f dataR.pw_SH:%ld dataR.i_SH:%ld for RSE_target:%04d RSH_target:%04d\n",step, (dbperstep * dbstep), att , ldrattn.dataR[step].pw_SH,ldrattn.dataR[step].i_SH,  RSE_target, RSH_target);
+		printf("Step:%02d DB:%f Attn:%f dataL.pw_SH:%ld dataL.i_SH:%ld for LSE_target:%04d LSH_target:%04d time%ld ", step, (dbperstep * dbstep), att , ldrattn_t.dataL[step].pw_SH,ldrattn_t.dataL[step].i_SH, LSE_target, LSH_target,time(0));
+		printf("Step:%f DB:%f Attn:%f dataR.pw_SH:%ld dataR.i_SH:%ld for RSE_target:%04d RSH_target:%04d\n",step, (dbperstep * dbstep), att , ldrattn_t.dataR[step].pw_SH,ldrattn_t.dataR[step].i_SH,  RSE_target, RSH_target);
 
 		//PRINT(percent); PRINTLN("%");
-//		debugLog(LOG_INFO, "step :%02d DB:%02d Attn:%f RLSH %ld ILSH %ld RRSH %ld IRSH %ld TargetSE %ld TargetSH %ld\n",i,db, att , ldrattn.dataL[i].pw_SH,ldrattn.dataL[i].i_SH,ldrattn.dataR[i].pw_SH,ldrattn.dataR[i].i_SH,RSE_target, RSH_target);
+//		debugLog(LOG_INFO, "step :%02d DB:%02d Attn:%f RLSH %ld ILSH %ld RRSH %ld IRSH %ld TargetSE %ld TargetSH %ld\n",i,db, att , ldrattn_t.dataL[i].pw_SH,ldrattn_t.dataL[i].i_SH,ldrattn_t.dataR[i].pw_SH,ldrattn_t.dataR[i].i_SH,RSE_target, RSH_target);
 
-		debugLog(LOG_INFO, "RLSH %05d ILSH %05d ",ldrattn.dataL[step].pw_SH,ldrattn.dataL[step].i_SH);
-		debugLog(LOG_INFO, "RRSH %05d IRSH %05d ",ldrattn.dataR[step].pw_SH,ldrattn.dataR[step].i_SH);
+		debugLog(LOG_INFO, "RLSH %05d ILSH %05d ",ldrattn_t.dataL[step].pw_SH,ldrattn_t.dataL[step].i_SH);
+		debugLog(LOG_INFO, "RRSH %05d IRSH %05d ",ldrattn_t.dataR[step].pw_SH,ldrattn_t.dataR[step].i_SH);
 		debugLog(LOG_INFO, " TargetSE %05d TargetSH %05d\n",RSE_target, RSH_target);
 
 	} //end for shunt
@@ -1018,6 +1106,7 @@ int doCalibration(unsigned int impedance,int numsteps,int volume) {
 	//Todo : need to call setvolume??
 	//setVolume(volume);
 //	setCalibrationRelays(OFF);
-
+	write(fd,&ipcdata,1);	
+	calibdata->status = CALIB_SUCCESS; 
 	return 0;
 }

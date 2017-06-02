@@ -6,11 +6,15 @@
 #define ACTION_H 
 
 #define LDR_LOW_TOLERANCE 2 // percent between theory and measured R value acceptable for low R values
-#define LDR_ZERO_MIN 300000 // minimum acceptable R when PWM=0 
+#define LDR_ZERO_MIN 40// minimum acceptable R when PWM=0 
 #define LDR_FULL_MAX 200    // maximum acceptable R when PWM=255. 
 
 //#define TRUE 1
 //#define FALSE 0
+//#ifndef TRUE
+//#  define       TRUE    (1==1)
+//#  define       FALSE   (1==2)
+//#endif
 
 #define ON 1
 #define OFF  0
@@ -42,10 +46,10 @@
 #define LDR_R18 30000       //** precisely measured value of R18 resistor (default: 10000 ohm)
 
 // if any measured value is > 200 ohm, replace the LDR. Normal values are around 100 ohm.
-#define LDR_LSE_MIN 60     //** measured value of left series LDR R at maximum current
-#define LDR_LSH_MIN 60     //** measured value of left shunt LDR R at maximum current
-#define LDR_RSE_MIN 82     //** measured value of right series LDR R at maximum current
-#define LDR_RSH_MIN 58     //** measured value of right shunt LDR R at maximum current
+#define LDR_LSE_MIN 100     //** measured value of left series LDR R at maximum current
+#define LDR_LSH_MIN 100 //** measured value of left shunt LDR R at maximum current
+#define LDR_RSE_MIN 60 //** measured value of right series LDR R at maximum current
+#define LDR_RSH_MIN 60 //** measured value of right shunt LDR R at maximum current
 
 /*
 #define LDR_IOCTL_IDENT               'l'
@@ -97,6 +101,5 @@
 #define MAX_LDR_INPUT	65535 
 
 #define LOCK_FILE "/var/lock/ldrlock" 
-#define DBMAX 48
 
 #endif

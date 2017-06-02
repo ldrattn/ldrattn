@@ -26,7 +26,7 @@ int writeDigitalData (int channel, int val)
 	//printf("writing val:%04X on dac chan:%02X   config %02X \n", val, channel,config);
 	val = __bswap_16 (val) ;	
 	res = wiringPiI2CWriteReg16 (fd, config,val) ;
-	//printf("writing val:%04X on dac chan:%02X   config %02X res %d \n", val, channel,config,res);
+	//printf("writing val:%04X on dac chan:%02X   config %02X res %d  fd %d\n", val, channel,config,res,fd);
 	if (res < 0) {
 		return res;
 	} else if (res != 3) {
@@ -66,10 +66,10 @@ int ltc2655Setup (int i2cAddr)
 {
 
 	if ((fd = wiringPiI2CSetup (i2cAddr)) < 0) {
-		return FALSE ;
+		return FALSE;
 	}
 
-	return TRUE ;
+	return TRUE;
 }
 
 #if 0

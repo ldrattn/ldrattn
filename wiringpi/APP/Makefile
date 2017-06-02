@@ -6,7 +6,9 @@ CLIENT = client
 STATIC=libcsv.a
 AR=ar
 MKDIR=mkdir
-
+CP=cp
+BINPATH=/usr/local/sbin
+CP=cp
 LIBS=-lm -lpthread -lwiringPi
 
 _DEPS = debug.h 
@@ -36,6 +38,9 @@ $(APP): $(OBJ)
 $(CLIENT): $(COBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
+install: 
+	$(CP) $(APP) $(BINPATH) 
+	$(CP) $(CLIENT) $(BINPATH)
 .PHONY: clean
 
 clean:

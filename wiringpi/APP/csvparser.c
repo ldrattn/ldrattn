@@ -209,7 +209,7 @@ int readCalibData(char *Fname)
 } 
 
 
-int writeCalibData(char *Fname,unsigned int steps)
+int writeCalibData(char *Fname,unsigned int steps,LDRAttr ldrattn_t)
 {
 	struct csv_parser p;
 	FILE *outfile;
@@ -229,10 +229,10 @@ int writeCalibData(char *Fname,unsigned int steps)
 		return EXIT_FAILURE;
 	}
 	
-	sprintf(buf,"%d,%d,%d,\n",ldrattn.potImpedence,steps,ldrattn.ldrTemp);
+	sprintf(buf,"%d,%d,%d,\n",ldrattn_t.potImpedence,steps,ldrattn_t.ldrTemp);
 	csv_fwrite(outfile,buf,strlen(buf));	
 	for(i =0 ;i < steps;i++) {
-		sprintf(buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\n",ldrattn.dataR[i].pw_SE,ldrattn.dataR[i].pw_SH,ldrattn.dataR[i].i_SE,ldrattn.dataR[i].i_SH,ldrattn.dataL[i].pw_SE,ldrattn.dataL[i].pw_SH,ldrattn.dataL[i].i_SE,ldrattn.dataL[i].i_SH,ldrattn.targetres[i].series,ldrattn.targetres[i].shunt);	
+		sprintf(buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\n",ldrattn_t.dataR[i].pw_SE,ldrattn_t.dataR[i].pw_SH,ldrattn_t.dataR[i].i_SE,ldrattn_t.dataR[i].i_SH,ldrattn_t.dataL[i].pw_SE,ldrattn_t.dataL[i].pw_SH,ldrattn_t.dataL[i].i_SE,ldrattn_t.dataL[i].i_SH,ldrattn_t.targetres[i].series,ldrattn_t.targetres[i].shunt);	
 		csv_fwrite(outfile,buf,strlen(buf));	
 	}
 

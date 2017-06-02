@@ -24,7 +24,7 @@ struct ldrconf {
 };
 
 
-typedef enum { START_CALIB,SET_VOLUME,RELOAD_CONFIG,SAVE_CALIB,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG} LDRCmd; 
+typedef enum { CALIB_START,SET_VOLUME,RELOAD_CONFIG,CALIB_SAVE,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG,MUTE_VOLUME,CALIB_STATUS,CALIB_STOP} LDRCmd; 
 
 
 void print_usage()
@@ -38,6 +38,9 @@ printf("Usage: ./client\n\
 	-T temperature compenstaion\n\
 	-W write configuration\n\
 	-B set balance update\n\
+	-M Mute volume\n\
+	-P Calib status\n\
+	-O Calib stop\n\
 	-s arg number of calibrarion steps\n\
 	-b arg balance value\n\
 	-c arg balance channel\n\
@@ -75,62 +78,75 @@ int main(int argc,char *argv[])
 
 
 	
-	while((option = getopt(argc,argv,"CVRSTWBs:b:c:i:v:t:")) != -1) {
+	while((option = getopt(argc,argv,"CVRSTWBMPOs:b:c:i:v:t:")) != -1) {
 		switch(option) {
 			case 'C': //start calibrartion
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
-				command = START_CALIB;  	
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				command = CALIB_START;  	
 				break;
 			case 'V':  //set volume
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				command = SET_VOLUME;  	
 				break;
 			case 'R':  //reload config
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				command = RELOAD_CONFIG;  	
 				break;
 			case 'S':  //save calibration
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
-				command = SAVE_CALIB;  	
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				command = CALIB_SAVE;  	
 				break;
 			case 'T':  //get temperature 
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				command = TEMP_COMPENSATE;  	
 				break;
 			case 'W':  // write config
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				command = WRITE_CONFIG;  	
 				break;
 			case 'B':  // set balance 
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				command = BALANCE_UPDATE;  	
 				break;
+			case 'M':  //Mute volume 
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				command = MUTE_VOLUME;  	
+				break;
+			case 'P':  //calibration status 
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				command = CALIB_STATUS;  	
+				break;
+			case 'O':  //calibration status 
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				command = CALIB_STOP;  	
+				break;
+
 			case 's': //number of steps
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				conf.steps = atoi(optarg);		
 				break;
 			case 'b':  //balance value
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				conf.balanceval = atoi(optarg);	
 				break;
 			case 'c':  //balance channel
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				conf.balancechan = atoi(optarg); 
 				break;
 			case 'i':  //impedance
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				conf.impedance = atoi(optarg); 
 				break;
 			case 'v':  //volume
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				conf.volume = atoi(optarg); 
 				break;
 			case 't':  //temperature
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				conf.temperature = atoi(optarg); 
 				break;
 			default: 
-				printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				print_usage();
 				exit(EXIT_FAILURE);
 
@@ -138,12 +154,12 @@ int main(int argc,char *argv[])
 	}
 	
 	memset(cmd,'\0',MAXLEN);
-	printf("commnad %d %d %d %d %d %d %d \n",command,conf.steps,conf.balancechan,conf.balanceval,conf.impedance,conf.volume,conf.temperature );	
+	//printf("commnad %d %d %d %d %d %d %d \n",command,conf.steps,conf.balancechan,conf.balanceval,conf.impedance,conf.volume,conf.temperature );	
 
 	switch(command) 
 	{
-		case START_CALIB:
-			snprintf(cmd,MAXLEN,"%s %d %d","START_CALIB", conf.impedance,conf.steps);	
+		case CALIB_START:
+			snprintf(cmd,MAXLEN,"%s %d %d","CALIB_START", conf.impedance,conf.steps);	
 			break;
 		case SET_VOLUME:
 			snprintf(cmd,MAXLEN,"%s %d","SET_VOLUME", conf.volume);	
@@ -151,8 +167,8 @@ int main(int argc,char *argv[])
 		case RELOAD_CONFIG:
 			snprintf(cmd,MAXLEN,"%s","RELOAD_CONFIG");	
 			break;
-		case SAVE_CALIB:
-			snprintf(cmd,MAXLEN,"%s","SAVE_CALIB");	
+		case CALIB_SAVE:
+			snprintf(cmd,MAXLEN,"%s","CALIB_SAVE");	
 			break;
 		case BALANCE_UPDATE:
 			snprintf(cmd,MAXLEN,"%s %d %d","BALANCE_UPDATE",conf.balancechan,conf.balanceval );	
@@ -163,9 +179,18 @@ int main(int argc,char *argv[])
 		case WRITE_CONFIG:
 			snprintf(cmd,MAXLEN,"%s %d %d %d %d %d %d","WRITE_CONFIG", conf.steps,conf.impedance,conf.volume,conf.balancechan,conf.balanceval,conf.temperature);	
 			break;
+		case MUTE_VOLUME:
+			snprintf(cmd,MAXLEN,"%s","MUTE_VOLUME");	
+			break;
+		case CALIB_STATUS:
+			snprintf(cmd,MAXLEN,"%s","CALIB_STATUS");	
+			break;
+		case CALIB_STOP:
+			snprintf(cmd,MAXLEN,"%s","CALIB_STOP");	
+			break;
 		
 	}	
-	printf("the command is %s\n",cmd);
+	//printf("the command is %s\n",cmd);
 #if 1
 	
 	
@@ -174,7 +199,7 @@ int main(int argc,char *argv[])
 	    exit(1);
 	}
 	
-	printf("Trying to connect... %s\n",SOCK_PATH);
+	//printf("Trying to connect... %s\n",SOCK_PATH);
 
 	remote.sun_family = AF_UNIX;
 	strcpy(remote.sun_path, SOCK_PATH);
@@ -185,9 +210,16 @@ int main(int argc,char *argv[])
 	
 	}
 
-	printf("Connected.\n");
+	//printf("Connected.\n");
 	
+	printf("Request: %s \n",cmd);
 	send(s,cmd,MAXLEN,0);	
+	if(command == CALIB_STATUS) {
+		memset(cmd,'\0',MAXLEN);
+		recv(s,cmd,MAXLEN,0);
+		printf("Response: %s \n",cmd);
+
+	}
 	
 
 	close(s);
