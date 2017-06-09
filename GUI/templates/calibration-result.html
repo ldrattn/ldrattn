@@ -2,16 +2,42 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />		
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />	
+		<style>
+		#myProgress {
+		  width: 100%;
+		  background-color: #ddd;
+		}
+
+		#myBar {
+		  width: 1%;
+		  height: 30px;
+		  background-color: #4CAF50;
+		  text-align: center;
+		  line-height: 30px;
+		  color: white;
+		}
+		</style>	
 		<script type="text/javascript">
 			//var cmd = '<?php echo $cmd ?>';
+			var progress = 1;
 			var pot = '{{ calibdata['pot'] }}';
 			var impd = '{{ calibdata['impedanceval'] }}';
 			var steps = '{{ calibdata['calibsteps'] }}';
+			var calibrunning = '{{ calibdata['running'] }}';
+			var factor = 100 / ((steps-1) * 2);
+			//alert(factor);
 
+			$main("#button-save").button("option", "disabled", true);
 			
 			function callData() {
-				AjaxCall("system-calls?FTYPE=CALIBRATION&POT="+pot+"&IMPEDANCE="+impd+"&STEPS="+steps, 1);
+				if( calibrunning == 1) {
+					if(calibstatus_interval==-1){
+						calibstatus_interval = setInterval(getCalibrationStatus, 5000);
+					}
+				} else {
+					AjaxCall("system-calls?FTYPE=CALIBRATION&POT="+pot+"&IMPEDANCE="+impd+"&STEPS="+steps, 1);
+				}
 			}
 			function getCalibrationStatus(){
 				AjaxCall("system-calls?FTYPE=CALIBSTATUS&POT="+pot+"&IMPEDANCE="+impd+"&STEPS="+steps, 2);
@@ -52,7 +78,7 @@
 					if (httpObj.status == 200) {
 						setINFO(httpObj.responseText);
 						if(calibstatus_interval==-1){
-							calibstatus_interval = setInterval(getCalibrationStatus, 5000);
+							calibstatus_interval = setInterval(getCalibrationStatus, 10000);
 						}
 					}
 				}
@@ -60,11 +86,51 @@
 			function handleSTATUS() {
 				if (httpObj.readyState == 4) {
 					if (httpObj.status == 200) {
+						
+						var arr = new Array;
+                        var arr1 = new Array;
+                        var arr2 = new Array;
+	                   	arr = httpObj.responseText;
+						//alert(arr);
+						arr1 = arr.split(",");
+						//alert(arr1[2]);
+						if( arr1[2] == "2") {
+							//parent.showMessage();
+							clearStatusInterval();
+							$main("#button-save").button("option", "disabled", false);
+							document.getElementById("prgmsg").innerHTML = "Calibration completed please save";
+							
+							getProgress((steps-1), (steps-1));
+						} else if (arr1[2] == "1") {
+							//parent.hideMessage();
+							getProgress(arr1[3], arr1[4]);
+						} else if (arr1[2] == "0") {
+							clearStatusInterval();
+							parent.closeAddEditDialog();
+							parent.document.getElementById("container").src = parent.document.getElementById("container").src;
+						}
 						setINFO(httpObj.responseText);
-					}
+					} 
 				}
 			}
 			
+			function getProgress(left, right) {
+				var a = parseInt(left);
+				var b = parseInt(right);
+				//alert(a );
+				//alert(b);
+				var elem = document.getElementById("myBar");   
+      				progress = a + b;
+				//alert(progress);
+				progress = progress * factor;
+				progress = progress.toFixed();
+				//alert(progress);
+				
+				elem.style.width = progress + '%'; 
+     				elem.innerHTML = progress * 1  + '%';
+			}
+
+
 			function setINFO(responseText) {
 				document.getElementById("testresult").innerHTML = responseText;
 			}
@@ -82,11 +148,27 @@
 			<div class="pgtitle"><label id="pagetitle">Calibration Result</label><input type="button" class="btn-close" onclick="closeDialog()" onfocus="if(this.blur)this.blur()" /></div>
 			<div class="popup-content" style="height: 270px">
 				<div id="testresult" style="font-size: 12px; margin-left: 10px">
-					<div align="center" style="margin-top: 80px">
-						<img src="../static/images/loading1.gif" /><br />
-						<label style="font-weight: bold">Please wait</label>
+				
+				</div>
+				<div align="center" style="margin-top: 80px">
+					<label id="prgmsg" style="font-weight: bold">Please wait calibration in progress...</label><br/>
+					<div align="left" id="myProgress" style="width:300px;">
+				
+ 				 		<div id="myBar" align="left">0%</div>
+				 
 					</div>
 				</div>
+				<div align="center" id="prbar" style="margin-top: 80pxi; display:none">
+                                        <label>Calibration completed please save</label><br/>
+                                        <div align="left" id="mProgress" style="width:300px;">
+
+                                                <div id="mBar" align="left">100%</div>
+
+                                        </div>
+                                </div>
+
+
+
 			</div>
 			<div class="popup-footer">
 				
