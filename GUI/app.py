@@ -32,8 +32,13 @@ def calibration():
 		data['running'] = action.is_calibration_running()
 	if request.method == 'POST':
 		data = daccess.save_calib_info(request)
+		data1 = daccess.get_dashboard_data()
+
 		action.save_calib_data(data)
-		action.reload_ldr()
+
+		if data['impedanceval'] == data1['impedanceval']:
+			action.reload_ldr()
+		
 		data = daccess.get_calib_data() 
 		data['refresh'] = 1
 

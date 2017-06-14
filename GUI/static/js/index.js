@@ -84,21 +84,27 @@ function callCalibrationPage(pot, impd, steps, pageid, ht, wt) {
 		width : wt,
 		closeOnEscape : false,
 		//dialogClass : "no-close"
-		buttons : {
-			"SAVE" : //function() {
-				//$main(this).dialog("close");
-				//callDelete(1, val);
-				function() {
-				$main(this).dialog("close");
-				document.getElementById('container').contentWindow.submitData();
-				clearStatusInterval();
-			},
-			"CANCEL" : function() {
-				$main(this).dialog("close");
-				clearStatusInterval();
-				stopCalibration();
-			}
-		}
+		buttons : [
+                        {
+                            id: "button-save",
+                            text: "SAVE",
+                            click: function() {
+                                $main(this).dialog("close");
+                                document.getElementById('container').contentWindow.submitData();
+                                clearStatusInterval();
+                            }
+                        },
+                        {
+                            id: "button-cancel",
+                            text: "CANCEL",
+                            click: function() {
+                                $main(this).dialog("close");
+                                clearStatusInterval();
+                                stopCalibration();
+                            }
+                        }
+
+                ]
 	});
 	$main(".ui-dialog-titlebar").hide();
 	$main(".ui-widget-content").addClass("custom-add-edit-dialog");
