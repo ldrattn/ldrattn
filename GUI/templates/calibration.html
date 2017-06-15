@@ -14,19 +14,29 @@
 			var cust_id = "{{ calibdata['pot']}}";
 			//var m_id = '<?php echo $mid ?>';
 			//var usb_type="No";
+			var calstatus = '{{ calibdata['running'] }}';
+
 			$sub(document).ready(function () {
 				if(cust_id == "Custom") {
 					$sub("#CUST_VAL").show();
 				}
 				refreshPage();
+				getCheckCalibration();
 				initValidation();			
 			});
 			
+			function getCheckCalibration() {
+				if ( calstatus == 1) {
+					start_calib();
+				} 
+			}
+
+
 			function initValidation() {
 					//alert("11111");
 				
 					$sub("#STPS").attr("data-validation-engine","validate[required,custom[onlyNumberSp]]");
-					
+					$sub("#STPS").attr("data-validation-engine","validate[required,custom[onlyNumberSp],min[24],max[100]]");	
 					$sub("#calibconfig").validationEngine('attach', {promptPosition : "bottomRight"});
 			
 			}

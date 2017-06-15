@@ -30,6 +30,18 @@ def save_dashboard_data(request):
 	return 0;
 
 
+def reload_ldr():
+	
+	command = "client -R"
+	print command
+
+	p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	for line in p.stdout.readlines():
+	    print line,
+	retval = p.wait()
+	return retval;
+
+
 def start_calibration(pot, impval, steps):
 	
 	command = "client -C -i %d -s %d" % (impval, steps)
@@ -56,6 +68,16 @@ def calibration_status(pot):
 	retval = p.wait()
 	
 	return response 
+
+def is_calibration_running():
+	res = 0
+	tmpres = calibration_status(None)
+	res2 = re.findall(r"Response:\s?(\d+),(\d+),(\d),", tmpres, re.IGNORECASE)   # Response: <pot>,<steps>,<status>,<left>,<right>
+	if (len(res2) > 0):
+		tmp = res2[0]
+		if (tmp[2] == "1"):
+			res=1
+	return res
 
 def stop_calibration(pot):
 	

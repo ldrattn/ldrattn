@@ -20,6 +20,7 @@ def dashBoard():
 			data['impedance'] = pot
 	if request.method == 'POST':
 		action.save_dashboard_data(request)
+		action.reload_ldr()
 		data = daccess.get_dashboard_data() 
 	return render_template('dashboard.html', ldrdata=data)
 
@@ -28,9 +29,16 @@ def calibration():
 	if request.method == 'GET':
 		data = daccess.get_calib_data() 
 		data['refresh'] = 0
+		data['running'] = action.is_calibration_running()
 	if request.method == 'POST':
 		data = daccess.save_calib_info(request)
+		data1 = daccess.get_dashboard_data()
+
 		action.save_calib_data(data)
+
+		if data['impedanceval'] == data1['impedanceval']:
+			action.reload_ldr()
+		
 		data = daccess.get_calib_data() 
 		data['refresh'] = 1
 
@@ -43,8 +51,8 @@ def calibration_result():
 		data = daccess.get_calib_data() 
 		data['pot'] = request.args.get('pot')
 		data['impedanceval'] = request.args.get('impd')
-		data['calibsteps'] = request.args.get('steps') 
-	
+		data['calibsteps'] = request.args.get('steps')
+		data['running'] = action.is_calibration_running() 
 	return render_template('calibration-result.html', calibdata=data)
 
 
