@@ -1,9 +1,12 @@
 import os.path
 import csv
+from os import listdir
+import re
 
 ldrconf = "/usr/local/etc/ldrattn/ldrattn.conf" 
 calibconf = "/usr/local/etc/ldrattn/calibration.conf"
 savedcsvdir = "/usr/local/etc/ldrattn/csv/"
+potlist = [ "10", "30", "60", "80" ]
 
 #defVolume=15
 #impedance=10
@@ -33,8 +36,26 @@ def load_default_calib_data():
         calibdata['calibsteps'] = 48
         calibdata['customsteps'] = "no"
 
+def get_pot_file(pot):
+	if(pot=="Custom"):
+		for f in listdir(savedcsvdir):
+			f = re.sub(r'\k.csv$', '', f)
+			
+			if f not in potlist:
+				pot = f
+
+	return savedcsvdir + pot + "k.csv" 
+
+def get_active_pot_file():
+	uuidArray = []
+	for f in listdir(savedcsvdir):
+		f = re.sub(r'\k.csv$', '', f)
+		uuidArray.append(int(f))
+	return uuidArray
+		
+
 def update_calib_info(pot, data):
-	csvfile = savedcsvdir + pot + "k.csv" 
+	csvfile = get_pot_file(pot)
 	if os.path.isfile(csvfile):
 		with open(csvfile) as f:
 			reader = csv.reader(f)
@@ -47,13 +68,17 @@ def update_calib_info(pot, data):
 
 def get_dashboard_data():
 	load_default_dashboard_data()
-
+	
 	with open(ldrconf) as ldrfile:
 		for line in ldrfile:
 			name, var = line.partition("=")[::2]
 			ldrconfdata[name.strip()] = var.strip()
 
 	update_calib_info(ldrconfdata['impedance'], ldrconfdata)
+	if ldrconfdata['impedance'] not in potlist:
+		ldrconfdata['impedance'] = "Custom"
+		ldrconfdata['potlist'] = potlist
+		 
 	return ldrconfdata;
 
 def get_calib_data():
@@ -78,7 +103,7 @@ def save_calib_info(request):
 	return calibdata
 
 def get_savedcalibdata(pot):
-	csvfile = savedcsvdir + pot + "k.csv" 
+	csvfile = get_pot_file(pot)
 	if os.path.isfile(csvfile):
 		with open(csvfile) as f:
 			reader = csv.reader(f)

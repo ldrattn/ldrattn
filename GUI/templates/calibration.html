@@ -12,19 +12,20 @@
 		</script>
 		<script type="text/javascript">
 			var cust_id = "{{ calibdata['pot']}}";
-			//var m_id = '<?php echo $mid ?>';
-			//var usb_type="No";
+			var cust_value = "{{ calibdata['impedanceval']}}";
+			//alert(cust_value);
 			var calstatus = '{{ calibdata['running'] }}';
 
 			$sub(document).ready(function () {
 				if(cust_id == "Custom") {
 					$sub("#CUST_VAL").show();
+					
 				}
 				refreshPage();
 				getCheckCalibration();
 				initValidation();			
 			});
-			
+
 			function getCheckCalibration() {
 				if ( calstatus == 1) {
 					start_calib();
@@ -33,16 +34,13 @@
 
 
 			function initValidation() {
-					//alert("11111");
-				
 					$sub("#STPS").attr("data-validation-engine","validate[required,custom[onlyNumberSp]]");
-					$sub("#STPS").attr("data-validation-engine","validate[required,custom[onlyNumberSp],min[24],max[100]]");	
+					$sub("#STPS").attr("data-validation-engine","validate[required,custom[onlyNumberSp],min[24],max[100]]");
 					$sub("#calibconfig").validationEngine('attach', {promptPosition : "bottomRight"});
 			
 			}
 
 			function submitData() {
-				//alert("submit data");
 				if($sub("#calibconfig").validationEngine('validate')) {
 					
 					$sub("#CPVALUE").val($sub("#CPVALUE_f").val());
@@ -57,88 +55,24 @@
 			}
 
 			function start_calib() {
-				
-				//$sub("#HOST_TRACE").removeAttr("data-validation-engine");
-				
 				if($sub("#calibconfig").validationEngine('validate')) {
 				
 					var pot = $sub("#CPVALUE_f").val();
 					var impd= $sub("#CUST_VAL").val();
 					var steps = $sub("#STPS").val();
 					
-					//alert(impd);
-					//alert(steps);
-					parent.callCalibrationPage(pot, impd, steps, 'calibrationresult', 400, 700);
-					
+					parent.callCalibrationPage(pot, impd, steps, 'calibrationresult', 400, 700);	
 				}
 			}
 
 
 
-		/*	function start_calib() {
-				var imp_val = $sub("#CPVALUE_f").val();
-				//var temp = $sub("#CPVALUE").val($sub("#CPVALUE_f").val());
-				//var imp_val = temp;
-				var steps = $sub("#STPS").val();
-				alert(imp_val);
-				alert(steps);	
-				parent.showMessage();
-				//$("#OPT_FORWARD").html("");
-				//$("#list_option").show();
-				parent.$main.ajax({
-					url : "../View/system-calls.php?FTYPE=CALIBRATION&IMPEDANCE=" + imp_val + "&STEPS=" + steps
-				}).done(function(output) {
-					//alert(output);
-
-
-				//	parseXML(output, mode);
-					//fetch_forward_mobile_busy();
-				});
-			} */
-
-		/*	function start_calib() {
-				alert("11111111");
-				//$.ajax({
-				parent.$main.ajax({
-					url : "system-calls.php?FTYPE=CALIBRATION"
-				}).done(function(output) {
-					var arr = output.split("<RESULT>");
-					var progress = arr[0].split("<SUCCESS>");
-					var prg_per = progress[1];
-					if( progress[1] === undefined ) {
-						var progress = arr[0].split("<FAILED>");
-						//if( progress[1] === undefined ) {} else {
-						//	$("#PERCENT").css("color", "red");
-						//	$("#STATUS").css("color", "red");
-						//	$("#STATUS").html("Failed");
-						//	$("#stop-btn").hide();
-						//	$("#close-btn").show();
-						//}
-					} else {
-						if (progress[1].trim() == "30%") {
-							installDahdi();
-							called = 1;
-						}
-						
-						if (progress[1].trim() == "COMPLETED") {
-							prg_per = "100%";
-							$sub("#stop-btn").hide();
-							$sub("#close-btn").show();
-							$sub("#STATUS").html("Finished");
-						}
-					}
-					$sub("#PERCENT").html(prg_per);
-					$sub("#PROGRESS").css("width", prg_per);
-					$sub("#INSTALL_LOG").html(arr[1]);
-					$sub(".INSTALL_LOG").animate({ scrollTop: $sub("#INSTALL_LOG")[0].scrollHeight }, "fast");
-				});
-			}
-			*/
-
+	
 			function setpot() {
 				var p_val = $sub("#CPVALUE_f").val();
 				if(p_val == "Custom") {
 					$sub("#CUST_VAL").show();
+					$sub("#CUST_VAL").val(cust_value);
 				} else {
 					$sub("#CUST_VAL").hide();
 					if(p_val == "10")
@@ -251,7 +185,7 @@
 											<td style="font-size: 13px; font-weight: bold">
 											</td>
 											<td id="gpio_40_td" style="font-size: small">
-								<!--		<a onclick="submitData()" style="margin-top: 0px" class="btn-grey-wide-l-2" ><span>Start</span></a>&nbsp;&nbsp;<a onclick="Save_values()" style="margin-top: 0px" class="btn-grey-wide-l-2" ><span>Save</span></a>-->
+								
 											<a onclick="start_calib()" style="margin-top: 0px" class="btn-grey-wide-l-2" ><span>Start</span></a>
 											</td>
 											
@@ -270,22 +204,10 @@
 						</form>
 					</div>
 				</div>
-				<!--<div id="dialog-savedata" title="confirm">
-				<p id="confirmsavedata" style="display: none">
-					<img src="images/icn-reboot.png" style="float:left; margin:0 7px 20px 0; height: 50px;" />
-					<div id="confirmsavedata_div" style="font-size: 13px; margin-left: 10px; display: none">
-						Are you sure you want to save the data
-					</div>
-				</p>
-				</div>-->
-
 
 			</div>
 			<div class="page-btns">
-			<!--
-				<a class="btn-grey-wide-l" onclick="submitData(0)"><span>Save</span></a>
-				<a class="btn-grey-wide-l" onclick="submitData(1)"><span>Update Asterisk Details</span></a>
-			-->
+			
 			</div>
 		</div>
 	</body>

@@ -27,28 +27,36 @@
 		<script type="text/javascript">
 			
 			var pot_val = '{{ ldrdata['impedance']|safe }}';
-			//alert(pot_val);
-			//var m_id = '<?php echo $mid ?>';
+			var pot_list = '{{ ldrdata['potlist'] }}';
+			var pot_activefile = '{{ potactive }}' ;
+			var pot_array = [ "{{ potactive[0]|safe}}", "{{ potactive[1]|safe}}", "{{ potactive[2]|safe}}", "{{ potactive[3]|safe}}", "{{ potactive[4]|safe}}"]; 
+			//alert(pot_array);
 			
 			$sub(document).ready(function () {
-				refreshPage();
+				
 				if(pot_val == "Custom") {
 					$sub("#PROXY").show();
 				}else {
 					$sub("#PROXY").hide();
 				}
-				
-				
+
+				if ($sub.inArray("10", pot_array) == -1 ) {
+					document.getElementById("imp10").style.display = "none";
+				} else if ($sub.inArray("30", pot_array) == -1) {
+					document.getElementById("imp30").style.display = "none";
+				} else if ($sub.inArray("60", pot_array) == -1) {
+					document.getElementById("imp60").style.display = "none";
+				} else if ($sub.inArray("80", pot_array) == -1) {
+					document.getElementById("imp80").style.display = "none";
+				}
+
+				refreshPage();
 				initValidation();			
 			});
 			
 			function initValidation() {
-					//alert("11111");
-				
 					$sub("#TEMP").attr("data-validation-engine","validate[required,custom[onlyNumberSp]]");
-					
 					$sub("#homeconfig").validationEngine('attach', {promptPosition : "bottomRight"});
-			
 			}
 
 			function submitData() {
@@ -58,15 +66,11 @@
 					$sub("#PVALUE").val($sub("#PVALUE_f").val());
 					$sub("#PROXY").val();
 					$sub("#TEMP").val();
-					
 					$sub("#bal_slide").val();
-					
 					$sub("#vol_slide").val();
 
-					//var formObj = document.forms[0];
 					formObj.submit_action.value = "1";
 					formObj.submit();
-				
 				}
 			}
 			
@@ -130,15 +134,18 @@
 										PoT Value &nbsp;&nbsp;&nbsp;&nbsp; </label> 										
 												</td>
 												<td style="font-size: 16px; font-weight: bold">
+											
 												<select id="PVALUE_f" name="PVALUE_f" class="ipDrpBox" onchange="setDisplay()" onkeyup="setDisplay()" >
-									<option value="10" {{ "selected" if ldrdata['impedance'] == '10' }} >10</option>
-									<option value="30" {{ "selected" if ldrdata['impedance'] == '30' }} >30</option>
-									<option value="60" {{ "selected" if ldrdata['impedance'] == '60' }} >60</option>
+									<option id="imp10" value="10" {{ "selected" if ldrdata['impedance'] == '10' }} >10</option>
+								
+									<option id="imp30" value="30" {{ "selected" if ldrdata['impedance'] == '30' }} >30</option>
+									<option id="imp60" value="60" {{ "selected" if ldrdata['impedance'] == '60' }} >60</option>
 
 
-									<option value="80" {{ "selected" if ldrdata['impedance'] == '80' }} >80</option>
-									<option value="Custom" {{ "selected" if ldrdata['impedance'] == 'custom' }} >Custom</option>
-									</select>
+									<option id="imp80" value="80" {{ "selected" if ldrdata['impedance'] == '80' }} >80</option>
+									<option value="Custom" {{ "selected" if ldrdata['impedance'] == 'Custom' }} >Custom</option>
+												</select>
+											
 								<input maxlength="5" style="display:none" value="{{ ldrdata['impedanceval']}}" id="PROXY" name="PROXY" type="text" disabled class="ipBox-disabled" />
 									&nbsp;<label style="font-size: 10px">Kohms &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT {{ ldrdata['temp_calib'] }} &#x2103</label>
 

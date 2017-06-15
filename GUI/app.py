@@ -22,7 +22,8 @@ def dashBoard():
 		action.save_dashboard_data(request)
 		action.reload_ldr()
 		data = daccess.get_dashboard_data() 
-	return render_template('dashboard.html', ldrdata=data)
+	potactive = daccess.get_active_pot_file()
+	return render_template('dashboard.html', ldrdata=data, potactive=potactive)
 
 @app.route("/calibration", methods=['GET', 'POST'])
 def calibration():
@@ -90,9 +91,10 @@ def savedvalues():
 	info= daccess.get_savedcalibinfo(pot)
 
 	data= daccess.get_savedcalibdata(pot)
-
-
-	return render_template('saved-values.html', saveddata=data, calibinfo=info)
+	
+	potactivelist = daccess.get_active_pot_file()
+	
+	return render_template('saved-values.html', saveddata=data, calibinfo=info, potactivelist=potactivelist)
 
 
 @app.route("/help")

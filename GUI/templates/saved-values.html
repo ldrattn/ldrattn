@@ -24,8 +24,12 @@
 			
 			$(document).ready(function() {
 				var pot = "{{ calibinfo['pot'] }}"
-				if(pot == "Custom")
+				var activepot = "{{ potactivelist }}"
+				var activepot_array = [ "{{ potactivelist[0]|safe}}", "{{ potactivelist[1]|safe}}", "{{ potactivelist[2]|safe}}", "{{ potactivelist[3]|safe}}", "{{ potactivelist[4]|safe}}"];  
+				//alert(activepot_array);
+				if(pot == "Custom") {
 					$("#PROXY").show();
+				}
 
 				oTable = $('#Treport').dataTable({
 					"sScrollY": 216,
@@ -72,6 +76,16 @@
 						$('#delete_selected').attr('onclick','').unbind('click');
 					}
 				});
+
+				if ($.inArray("10", activepot_array) == -1 ) {
+					document.getElementById("imp10").style.display = "none";
+				} else if ($.inArray("30", activepot_array) == -1) {
+					document.getElementById("imp30").style.display = "none";
+				} else if ($.inArray("60", activepot_array) == -1) {
+					document.getElementById("imp60").style.display = "none";
+				} else if ($.inArray("80", activepot_array) == -1) {
+					document.getElementById("imp80").style.display = "none";
+				}
 			});
 
 			
@@ -120,12 +134,12 @@
 							PoT Value &nbsp;&nbsp;&nbsp;&nbsp; </label> 								</td>
 							<td style="font-size: 13px; font-weight: bold">
 								<select id="PVALUE_f" name="PVALUE_f" class="ipDrpBox" onchange="setDisplay()" onkeyup="setDisplay()" >
-									<option value="10" {{ "selected" if calibinfo['pot'] == "10" }}>10</option>
-									<option value="30" {{ "selected" if calibinfo['pot'] == "30" }}>30</option>
-									<option value="60" {{ "selected" if calibinfo['pot'] == "60" }}>60</option>
+									<option id="imp10" value="10" {{ "selected" if calibinfo['pot'] == "10" }}>10</option>
+									<option id="imp30" value="30" {{ "selected" if calibinfo['pot'] == "30" }}>30</option>
+									<option id="imp60" value="60" {{ "selected" if calibinfo['pot'] == "60" }}>60</option>
 
 
-									<option value="80" {{ "selected" if calibinfo['pot'] == "70" }}>80</option>
+									<option id="imp80" value="80" {{ "selected" if calibinfo['pot'] == "80" }}>80</option>
 									<option value="Custom" {{ "selected" if calibinfo['pot'] == "Custom" }}>Custom</option>
 								</select>
 								<input maxlength="5" style="display:none" value="{{ calibinfo['impedanceval']}}" id="PROXY" name="PROXY" type="text" disabled class="ipBox-disabled" />
@@ -147,9 +161,6 @@
 					<table cellpadding="0" cellspacing="0" border="0" class="display" id="Treport">
 						<thead>
 							<tr>
-								<!--
-								<th class="sorting_disabled"><input type="checkbox" id="checkall" align="center" /></th>-->
-								<!--<th><a href="#">S.No</a></th>-->
 								<th><a href="#">Steps</a></th>
 								<th><a href="#">Shunt Resistance</a></th>
 								<th><a href="#">Series Resistance</a></th>
@@ -189,10 +200,7 @@
 				<div style="height: 10px">&nbsp;</div>
 			</div>
 			<div class="page-btns">
-			<!--	<a  class='btn-grey-wide-l' onclick='report_data(1)'><span>Serial & Mac CSV Report</span></a>
-				<a  class='btn-grey-wide-l' onclick='report_data(2)'><span>Serial & Mac Test CSV Report</span></a>
-				<a  class='btn-grey-wide-l' onclick='report_data(3)'><span>Complete Text Report</span></a>
-				<a class='btn-grey-wide-l' onclick='del_data()'><span>Delete All</span></a>-->
+			
 			</div>
 		</div>
 		<form id="ldrsavedform" method="GET" action="">
