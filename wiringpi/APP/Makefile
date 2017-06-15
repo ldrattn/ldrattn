@@ -6,7 +6,6 @@ CLIENT = client
 STATIC=libcsv.a
 AR=ar
 MKDIR=mkdir
-CP=cp
 BINPATH=/usr/local/sbin
 CP=cp
 LIBS=-lm -lpthread -lwiringPi
@@ -37,6 +36,7 @@ $(APP): $(OBJ)
 
 $(CLIENT): $(COBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
+
 
 install: 
 	$(CP) $(APP) $(BINPATH) 

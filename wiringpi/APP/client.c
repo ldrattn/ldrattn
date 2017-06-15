@@ -24,7 +24,7 @@ struct ldrconf {
 };
 
 
-typedef enum { CALIB_START,SET_VOLUME,RELOAD_CONFIG,CALIB_SAVE,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG,MUTE_VOLUME,CALIB_STATUS,CALIB_STOP} LDRCmd; 
+typedef enum { CALIB_START,SET_VOLUME,RELOAD_CONFIG,CALIB_SAVE,BALANCE_UPDATE,TEMP_COMPENSATE,WRITE_CONFIG,MUTE_VOLUME,CALIB_STATUS,CALIB_STOP,INC_VOLUME,DEC_VOLUME} LDRCmd; 
 
 
 void print_usage()
@@ -41,6 +41,8 @@ printf("Usage: ./client\n\
 	-M Mute volume\n\
 	-P Calib status\n\
 	-O Calib stop\n\
+	-I Increment volume\n\
+	-D Decrement volume\n\
 	-s arg number of calibrarion steps\n\
 	-b arg balance value\n\
 	-c arg balance channel\n\
@@ -78,7 +80,7 @@ int main(int argc,char *argv[])
 
 
 	
-	while((option = getopt(argc,argv,"CVRSTWBMPOs:b:c:i:v:t:")) != -1) {
+	while((option = getopt(argc,argv,"CVRSTWBMPOIDs:b:c:i:v:t:")) != -1) {
 		switch(option) {
 			case 'C': //start calibrartion
 				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
@@ -120,6 +122,14 @@ int main(int argc,char *argv[])
 				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
 				command = CALIB_STOP;  	
 				break;
+			case 'I':  //calibration status 
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				command = INC_VOLUME;  	
+				break;
+			case 'D':  //calibration status 
+				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
+				command = DEC_VOLUME;  	
+				break;
 
 			case 's': //number of steps
 				//printf("%s %s %d\n",__func__,__FILE__,__LINE__);		
@@ -159,7 +169,7 @@ int main(int argc,char *argv[])
 	switch(command) 
 	{
 		case CALIB_START:
-			snprintf(cmd,MAXLEN,"%s %d %d","CALIB_START", conf.impedance,conf.steps);	
+			snprintf(cmd,MAXLEN,"%s %d %d ","CALIB_START", conf.impedance,conf.steps);	
 			break;
 		case SET_VOLUME:
 			snprintf(cmd,MAXLEN,"%s %d","SET_VOLUME", conf.volume);	
@@ -188,7 +198,13 @@ int main(int argc,char *argv[])
 		case CALIB_STOP:
 			snprintf(cmd,MAXLEN,"%s","CALIB_STOP");	
 			break;
-		
+		case INC_VOLUME:
+			snprintf(cmd,MAXLEN,"%s","INC_VOLUME");	
+			break;
+		case DEC_VOLUME:
+			snprintf(cmd,MAXLEN,"%s","DEC_VOLUME");	
+			break;
+
 	}	
 	//printf("the command is %s\n",cmd);
 #if 1

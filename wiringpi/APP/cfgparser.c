@@ -148,15 +148,33 @@ int readParseCfg()
 	return EXIT_SUCCESS;
 }
 
-int writeLDRConfig(unsigned int steps,unsigned int impedance,unsigned int volume,unsigned int balancechan,unsigned int balancevalue,unsigned int temp)
+int writeLDRConfig(char **argc)
 {
 	char buf[MAXBUF];
+	unsigned int steps;
+	unsigned int impedance;
+	unsigned int volume;
+	unsigned int balancechan;
+	unsigned int balancevalue;
+	unsigned int temperature;
+	printf("here we r %d %s\n",__LINE__,__FILE__);
+
+	steps = atoi(argc[1]); 	
+	printf("here we r %d %s\n",__LINE__,__FILE__);
+	impedance = atoi(argc[2]);
+	printf("here we r %d %s\n",__LINE__,__FILE__);
+	volume = atoi(argc[3]);
+	balancechan = atoi(argc[4]);
+	balancevalue = atoi(argc[5]);
+	temperature = atoi(argc[6]); 
+
 
 	FILE *fp = fopen (LDR_CONF, "w");
 	if (fp == NULL)
 	{
 		return EXIT_FAILURE;
 	}
+
 	
 	memset(buf,'\0',MAXBUF);
 	snprintf(buf,MAXBUF,"defVolume=%d\n",volume);
@@ -174,7 +192,7 @@ int writeLDRConfig(unsigned int steps,unsigned int impedance,unsigned int volume
 	snprintf(buf,MAXBUF,"balValue=%d\n",balancevalue);
 	fputs(buf,fp);
 	memset(buf,'\0',MAXBUF);
-	snprintf(buf,MAXBUF,"temperature=%d\n",temp);
+	snprintf(buf,MAXBUF,"temperature=%d\n",temperature);
 	fputs(buf,fp);
 
 	fclose(fp);
