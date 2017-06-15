@@ -1,34 +1,36 @@
 #ifndef LDRATTNAPP_H 
 #define LDRATTNAPP_H
 
-#define VOL_MAX_STEP 100     //** maximum volume steps; range: 20...80. Higher = more memory usage
+#define VOL_MAX_STEP 102     //** maximum volume steps; range: 20...80. Higher = more memory usage
 #define MAXLEN 80
 #define DBMAX 48
 #define MUTE 0 
+#define CALIB_MAXSTEP  100 
 
 #define MIN_VOLUME_STEPS 48     //** minimum volume steps; 
 typedef enum { CALIBRATED, NOTCALIBRATED } Calibstate;
-typedef enum { CALIB_START, CALIB_ONGOING,CALIB_SUCCESS,CALIB_FAILED} Calibstatus;
+typedef enum { CALIB_NONE, CALIB_ONGOING,CALIB_SUCCESS,CALIB_FAILED} Calibstatus;
+typedef enum { CRN_NONE, CRN_ONGOING} CRNstatus;
 
 typedef struct {
-	unsigned int pw_SE;            // series
-	unsigned int pw_SH;            // shunt
-	unsigned int i_SE;            // current series 
-	unsigned int i_SH;            // current shunt
+	unsigned short pw_SE;            // series
+	unsigned short pw_SH;            // shunt
+	unsigned short i_SE;            // current series 
+	unsigned short i_SH;            // current shunt
 } LDRdata;
 
 typedef struct {
-	unsigned int series;
-	unsigned int shunt;
+	unsigned short series;
+	unsigned short shunt;
 } LDRtargetres;
 
 typedef struct {
 	LDRdata dataL[VOL_MAX_STEP - 2];
 	LDRdata dataR[VOL_MAX_STEP - 2];
 	LDRtargetres targetres[VOL_MAX_STEP - 2];
-	unsigned int ldrTemp;      //
-	unsigned int potImpedence;
-	unsigned int calibSteps;
+	unsigned short ldrTemp;      //
+	unsigned short potImpedence;
+	unsigned short calibSteps;
 }LDRAttr;
 
 extern LDRAttr ldrattn;
@@ -47,7 +49,7 @@ struct volumeattr {
 struct calibattr {
 	unsigned int impedance;
 	int numsteps;
-	int volume;
+	int temperature;
 	int status;
 	int pipefd;
 	int shstep;
@@ -67,6 +69,13 @@ typedef struct {
 }LDRConf;
  
 extern LDRConf ldrconf; 
+extern unsigned int calibStop;
+extern unsigned int deltaStop;
+
+#ifndef TRUE
+#  define       TRUE    (1==1)
+#  define       FALSE   (1==2)
+#endif
 
 int readCalibData(char *); 
 void setVolume(int );

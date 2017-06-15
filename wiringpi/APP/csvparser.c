@@ -26,29 +26,13 @@ LDRConf ldrconf;
 
 void getCSVFilename(unsigned int impedance,char *csvfile)
 {
-	const char *pot10k = "/usr/local/etc/ldrattn/csv/10k.csv";
-	const char *pot30k = "/usr/local/etc/ldrattn/csv/30k.csv";
-	const char *pot50k = "/usr/local/etc/ldrattn/csv/50k.csv";
-	const char *pot80k = "/usr/local/etc/ldrattn/csv/80k.csv";
-	const char *custom = "/usr/local/etc/ldrattn/csv/custom.csv";
+	char filename[MAXLEN];
+	const char *csvpath = "/usr/local/etc/ldrattn/csv/";
+	
+	memset(filename,'\0',MAXLEN);		
+	sprintf(filename,"%s%dk.csv",csvpath,impedance);			
 
-	switch(impedance) {
-		case 10:
-			strcpy(csvfile,pot10k);	
-			break;
-		case 30:
-			strcpy(csvfile,pot30k);	
-			break;
-		case 50:
-			strcpy(csvfile,pot50k);	
-			break;	
-		case 80:
-			strcpy(csvfile,pot80k);	
-			break;
-		default:
-			strcpy(csvfile,custom);	
-	}
-
+	strcpy(csvfile,filename);	
 	LOG_TRACE(LOG_INFO,"the csvfile %s\n",csvfile);		 			
 }
 
@@ -209,7 +193,7 @@ int readCalibData(char *Fname)
 } 
 
 
-int writeCalibData(char *Fname,unsigned int steps,LDRAttr ldrattn_t)
+int writeCalibData(char *Fname,unsigned int steps,unsigned int temperature,LDRAttr ldrattn_t)
 {
 	struct csv_parser p;
 	FILE *outfile;
@@ -229,9 +213,9 @@ int writeCalibData(char *Fname,unsigned int steps,LDRAttr ldrattn_t)
 		return EXIT_FAILURE;
 	}
 	
-	sprintf(buf,"%d,%d,%d,\n",ldrattn_t.potImpedence,steps,ldrattn_t.ldrTemp);
+	sprintf(buf,"%d,%d,%d,\n",ldrattn_t.potImpedence,steps,temperature);
 	csv_fwrite(outfile,buf,strlen(buf));	
-	for(i =0 ;i < steps;i++) {
+	for(i =0 ;i <= steps;i++) {
 		sprintf(buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\n",ldrattn_t.dataR[i].pw_SE,ldrattn_t.dataR[i].pw_SH,ldrattn_t.dataR[i].i_SE,ldrattn_t.dataR[i].i_SH,ldrattn_t.dataL[i].pw_SE,ldrattn_t.dataL[i].pw_SH,ldrattn_t.dataL[i].i_SE,ldrattn_t.dataL[i].i_SH,ldrattn_t.targetres[i].series,ldrattn_t.targetres[i].shunt);	
 		csv_fwrite(outfile,buf,strlen(buf));	
 	}
