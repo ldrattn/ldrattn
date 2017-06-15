@@ -50,7 +50,7 @@ def get_active_pot_file():
 	uuidArray = []
 	for f in listdir(savedcsvdir):
 		f = re.sub(r'\k.csv$', '', f)
-		uuidArray.append(int(f))
+		uuidArray.append(f)
 	return uuidArray
 		
 
