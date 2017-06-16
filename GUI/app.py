@@ -89,9 +89,9 @@ def savedvalues():
 	
 	if (pot is None):
 		pot="10"
-	info= daccess.get_savedcalibinfo(pot)
+	info = daccess.get_savedcalibinfo(pot)
 
-	data= daccess.get_savedcalibdata(pot)
+	data = daccess.get_savedcalibdata(pot)
 	
 	potactivelist = daccess.get_active_pot_file()
 	
