@@ -109,6 +109,7 @@ def save_calib_info(request):
 	return calibdata
 
 def get_savedcalibdata(pot):
+	data = {}
 	csvfile = get_pot_file(pot)
 	if os.path.isfile(csvfile):
 		with open(csvfile) as f:
