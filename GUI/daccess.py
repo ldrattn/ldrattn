@@ -8,6 +8,7 @@ calibconf = "/usr/local/etc/ldrattn/calibration.conf"
 savedcsvdir = "/usr/local/etc/ldrattn/csv/"
 potlist = [ "10", "30", "60", "80" ]
 
+
 #defVolume=15
 #impedance=10
 #calibSteps=48
@@ -52,7 +53,12 @@ def get_active_pot_file():
 		f = re.sub(r'\k.csv$', '', f)
 		uuidArray.append(f)
 	return uuidArray
-		
+	
+def delete_custom_file(pot):
+	if(pot=="Custom"):
+		csvfile = get_pot_file(pot)	
+		os.remove(csvfile)
+
 
 def update_calib_info(pot, data):
 	csvfile = get_pot_file(pot)

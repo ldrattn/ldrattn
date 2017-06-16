@@ -59,7 +59,7 @@ def calibration_status(pot):
 	command = "client -P"
 	print command
 	response = "No response"
-
+	
 	p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	for line in p.stdout.readlines():
 	    	print line,

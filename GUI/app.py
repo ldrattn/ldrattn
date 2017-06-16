@@ -34,7 +34,8 @@ def calibration():
 	if request.method == 'POST':
 		data = daccess.save_calib_info(request)
 		data1 = daccess.get_dashboard_data()
-
+		pot = data['pot']
+		daccess.delete_custom_file(pot)
 		action.save_calib_data(data)
 
 		if data['impedanceval'] == data1['impedanceval']:
