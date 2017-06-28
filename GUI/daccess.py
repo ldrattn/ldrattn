@@ -118,6 +118,18 @@ def get_savedcalibdata(pot):
 			data = list(reader)
 	return data 
 
+def read_activelogfile():
+	data = {}
+	fname = "/tmp/ldrattnapp.log"
+	#with open("/tmp/text.log", "r") as ins:
+    	#	array = []
+    	#		array.append(line)
+	#		print array
+	with open(fname) as f:
+    		data = f.read().splitlines()
+		#print data
+	return data
+
 def get_savedcalibinfo(val):
 	savedcalibinfo['pot'] = val 
 	update_calib_info(val, savedcalibinfo)

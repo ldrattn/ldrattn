@@ -94,62 +94,52 @@
 				}
 			}
 			
-			function edit_data(val) {
-				parent.callEditPage(val, 'add-trunks.php', 560, 600);
-			}
-			
-			function add_data() {
-				parent.callAddPage('add-trunks.php', 560, 600);
-			}
-			
-			function delete_data(val) {
-				parent.callConfirmBox(val);
-			}
-			
-			function delete_data_all() {
-				var all_trunks = new Array();
-				var i = 0;
-				$("input:checkbox[name='chkbox']:checked").each(function() {
-					all_trunks[i++] = $(this).val();
-				});
-				var trunk_list = all_trunks.toString();
-				parent.callConfirmAllBox(trunk_list);
-			}
-			
-			function deleteAction(val, deletetoken) {
-				var formObj = document.forms[0];
-				if(val == 1) {
-					formObj.submit_action.value = "3";
-					formObj.TRUNK.value = deletetoken;
-					formObj.submit();
-				}
-			}
-			
-			function deleteAllAction(val, deletetoken) {
-				var formObj = document.forms[0];
-				if(val == 1) {
-					formObj.submit_action.value = "4";					
-					formObj.submit();
-				}
-			}
-
-
-			function report_data(val){
-					window.open('download_Template.php?type=' + val);
-			}
-			
-			function del_data(){
-					parent.callConfirmAllBox("All Reports");
-					//alert('Del');
-			}
-			function f1(val) {
+			function getsysLogData() {
+				AjaxCall("syslog-read", 1);
 				
+			}
+			
+
+			var httpObj = getHTTPObject();
+
+			function getHTTPObject() {
+				var xmlhttp;
+				if (window.XMLHttpRequest) {
+					xmlhttp = new XMLHttpRequest();
+				} else if (window.ActiveXObject) {
+					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+					if (!xmlhttp) {
+						xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+					}
+				}
+				return xmlhttp;
+			}
+			
+			function AjaxCall(ajax_URL, id) {
+				httpObj.open("GET", ajax_URL, true);
+				if (id == 1) {
+					httpObj.onreadystatechange = handleINFO;
+				}
+				httpObj.send(null);
+			}
+			
+			function handleINFO() {
+				if (httpObj.readyState == 4) {
+					if (httpObj.status == 200) {
+						setINFO(httpObj.responseText);
+						}
+				}
+			}
+			
+			function setINFO(responseText) {
+				//alert(responseText);
+				document.getElementById("testresult").innerHTML = responseText;
 			}
 		</script>
 	</head>
 	<body onclick="javascript: parent.hideMenu()" onload="f1('<?php echo $res ?>')">
 		<div class="content">
-			<h1>Monitor<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(2)" /></h1>
+			<h1>System Log<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(2)" /></h1>
 
 			<tr style="background-color:#fff">
 				<td>
@@ -158,7 +148,7 @@
 							<td>&nbsp;&nbsp;</td>
 							<td style="font-size: 16px; font-weight: bold">
 							<label style="">
-							PoT : <span><?php echo $lines[0] ?></span>kohms &nbsp; Volume: <span><?php echo $lines[3] ?></span>  at 25 &#x2103 &nbsp;&nbsp;&nbsp;&nbsp; </label> 								</td>
+							PoT : <span>{{ ldrdata['impedanceval']|safe }}</span>kohms &nbsp; Volume: <span>{{ ldrdata['defVolume']|safe }}</span>  at 25 &#x2103 &nbsp;&nbsp;&nbsp;&nbsp; </label> 								</td>
 							
 						</tr>
 					</table>
@@ -166,79 +156,26 @@
 			</tr>
 
 
-
-
-			<div id="siptrunksbody" style="height: ; overflow-y: hidden; width: 95%; overflow-x: hidden">
-				<div id="dt_example">
-				<div id="container" style="font-size: 13px">
-				<div class="demo_jui" style="box-shadow: 5px 5px 5px #aaa">
-					<table border="0" cellpadding="0" cellspacing="0" style="margin: 0px" class="table-config no-border">
-					<table cellpadding="0" cellspacing="0" border="0" class="display" id="Treport">
-						<thead>
-							<tr>
-								<!--
-								<th class="sorting_disabled"><input type="checkbox" id="checkall" align="center" /></th>-->
-								<th><a href="#">S.No</a></th>
-								<th><a href="#">ADC_Right Series</a></th>
-								<th><a href="#">ADC_Right Shunt</a></th>
-								<th><a href="#">ADC_Left Series</a></th>
-								<th><a href="#">ADC_Left Shunt</a></th>
-								<th><a href="#">DAC_Right Series</a></th>
-								<th><a href="#">DAC_Right Shunt</a></th>
-								<th><a href="#">DAC_Left Series</a></th>
-								<th><a href="#">DAC_Left Shunt</a></th>
-								
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-
-							for($i=0; $i<14; $i++) {
-
-							$dac_RSE = $csv[$i][0];
-							$dac_RSH = $csv[$i][1];
-							$adc_RSE = $csv[$i][2];
-							$adc_RSH = $csv[$i][3];
-							$dac_LSE = $csv[$i][4];
-							$dac_LSH = $csv[$i][5];
-							$adc_LSE = $csv[$i][6];
-							$adc_LSH = $csv[$i][7];
-
-							echo "<tr>
-								<td>$i</td>
-								<td>$adc_RSE</td>
-								<td>$adc_RSH</td>
-								<td>$adc_LSE</td>
-								<td>$adc_LSH</td>
-								<td>$dac_RSE</td>
-								<td>$dac_RSH</td>
-								<td>$dac_LSE</td>
-								<td>$dac_LSH</td>
-							       </tr>";
-							}
-							?>
-						</tbody>
-					</table>
-				</table>
+			<div class="content" style="width: 1000px">
+		
+			<div class="pgtitle"><label id="pagetitle">Sys log</label></div>
+			<div class="popup-content" style="overflow:auto; height: 270px">
+				<div style="font-size: 12px; margin-left: 10px">
+				<pre id="testresult"></pre>
 				</div>
-				</div>
-				</div>
-				<div style="height: 10px">&nbsp;</div>
 			</div>
-			<div class="page-btns">
-			<!--	<a  class='btn-grey-wide-l' onclick='report_data(1)'><span>Serial & Mac CSV Report</span></a>
-				<a  class='btn-grey-wide-l' onclick='report_data(2)'><span>Serial & Mac Test CSV Report</span></a>
-				<a  class='btn-grey-wide-l' onclick='report_data(3)'><span>Complete Text Report</span></a>
-				<a class='btn-grey-wide-l' onclick='del_data()'><span>Delete All</span></a>-->
+			<div class="popup-footer"  style="height: 20px">
+				
 			</div>
+		
+			</div>
+			
 		</div>
 		<form id="deleteform" method="post" action="">
 			<input type="hidden" name="submit_action" value="0" />
 			<input type="hidden" name="TRUNK" id="TRUNK" value="" />
 			<input type="hidden" name="TRUNKLIST" id="TRUNKLIST" value="" />
 		</form>
+		<script>getsysLogData();</script>
 	</body>
-	<script type="text/javascript">
-		parent.setUpdateValue('<?php echo $update_count ?>');
-	</script>
 </html>

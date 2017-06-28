@@ -2,8 +2,15 @@ from flask import Flask, render_template, request, Response
 import daccess
 import action
 import time
+import sys
+import subprocess
+from time import sleep
 
 app = Flask(__name__)
+
+#fh = open('/var/log/asterisk/messages')
+ff = "/var/log/ldrattnapp.log"
+sysfile = "/var/log/syslog"
 
 
 @app.route("/")
@@ -81,7 +88,78 @@ def system_calls():
 
 @app.route("/monitor")
 def monitor():
-	return render_template('monitor.html')
+	data = daccess.get_dashboard_data()
+	return render_template('monitor.html', ldrdata=data)
+
+def monitor_syslog(filename,linesback,returnlist):
+
+	avgcharsperline=75
+	file = open(filename,'r')
+	while 1:
+		try: file.seek(-1 * avgcharsperline * linesback,2)
+	        except IOError: file.seek(0)
+	        if file.tell() == 0: atstart=1
+	        else: atstart=0
+
+	        lines=file.read().split("\n")
+	        if (len(lines) > (linesback+1)) or atstart: break
+        #The lines are bigger than we thought
+	        avgcharsperline=avgcharsperline * 1.3 #Inc avg for retry
+	file.close()
+
+	if len(lines) > linesback: start=len(lines)-linesback -1
+	else: start=0
+	if returnlist: return lines[start:len(lines)-1]
+
+	out=""
+	for l in lines[start:len(lines)-1]: out=out + l + "\n"
+	return out
+
+
+@app.route("/syslog-read")
+def syslogfileread():
+	#data = log_generate()
+	data = monitor_syslog(sysfile,100,0)
+	return Response(data , mimetype='text/plain') 
+
+
+def tail_lines(filename,linesback,returnlist):
+
+	avgcharsperline=75
+	file = open(filename,'r')
+	while 1:
+		try: file.seek(-1 * avgcharsperline * linesback,2)
+	        except IOError: file.seek(0)
+	        if file.tell() == 0: atstart=1
+	        else: atstart=0
+
+	        lines=file.read().split("\n")
+	        if (len(lines) > (linesback+1)) or atstart: break
+        #The lines are bigger than we thought
+	        avgcharsperline=avgcharsperline * 1.3 #Inc avg for retry
+	file.close()
+
+	if len(lines) > linesback: start=len(lines)-linesback -1
+	else: start=0
+	if returnlist: return lines[start:len(lines)-1]
+
+	out=""
+	for l in lines[start:len(lines)-1]: out=out + l + "\n"
+	#print out
+	return out
+	
+
+@app.route("/log-stream")
+def logfilestream():
+	#data = log_generate()
+	data = tail_lines(ff,100,0)
+	return Response(data , mimetype='text/plain') 
+
+@app.route("/log-file")
+def logfile():
+	#data = daccess.read_activelogfile()
+	return render_template('log-file.html')
+
 
 @app.route("/saved-values")
 def savedvalues():

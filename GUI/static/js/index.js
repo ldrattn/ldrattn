@@ -567,6 +567,7 @@ function refreshFrame() {
 	document.getElementById("container").src = document.getElementById("container").src;
 }
 
+
 function setUpdateValue(val) {
 	if (parseInt(val) == 0) {
 		$main("#applychanges").attr("class", "apply-changes-disable");
