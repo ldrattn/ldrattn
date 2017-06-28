@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		 <meta http-equiv="refresh" content="10">
+		<link rel="stylesheet" type="text/css" media="screen" href="../static/css/style.css" />	
+		
+		<script type="text/javascript">
+			//function callData(){
+				//log_interval = setInterval(getLogData, 500);
+			//}
+
+			/*setInterval(function() {
+		        window.location.reload();
+			}, 10000);*/ 
+			
+			function goToLine(){
+				
+				var objDiv = document.getElementById("out");
+				
+				objDiv.scrollTop = objDiv.scrollHeight;
+				
+			}
+
+			function getLogData() {
+				AjaxCall("log-stream", 1);	
+			}
+			
+
+			var httpObj = getHTTPObject();
+
+			function getHTTPObject() {
+				var xmlhttp;
+				if (window.XMLHttpRequest) {
+					xmlhttp = new XMLHttpRequest();
+				} else if (window.ActiveXObject) {
+					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+					if (!xmlhttp) {
+						xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+					}
+				}
+				return xmlhttp;
+			}
+			
+			function AjaxCall(ajax_URL, id) {
+				httpObj.open("GET", ajax_URL, true);
+				if (id == 1) {
+					httpObj.onreadystatechange = handleINFO;
+				}
+				httpObj.send(null);
+			}
+			
+			function handleINFO() {
+				if (httpObj.readyState == 4) {
+					if (httpObj.status == 200) {
+						setINFO(httpObj.responseText);
+						}
+				}
+			}
+			
+			function setINFO(responseText) {
+				document.getElementById("testresult").innerHTML = responseText + "</br>";
+			}
+		</script>
+	</head>
+	<body onclick="javascript: parent.hideMenu()" onload="f1('<?php echo $res ?>')">
+		<div class="content">
+			<h1>Live Monitor<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(2)" /></h1>
+
+			<tr style="background-color:#fff">
+				<td>
+					<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
+						<tr>
+							<td>&nbsp;&nbsp;</td>
+							<td style="font-size: 16px; font-weight: bold">
+							</td>
+							
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<div class="content" style="width: 1000px">
+		
+			<div class="pgtitle"><label id="pagetitle">Live Monitor</label></div>
+			<div class="popup-content" id="out" style="overflow:auto; height: 270px" onscroll="goToLine()">
+				<div style="font-size: 12px; margin-left: 10px">
+				<pre id="testresult"></pre>
+				</div>
+			</div>
+			<div class="popup-footer"  style="height: 20px">
+				
+			</div>
+		
+			</div>
+			
+		</div>
+		
+		<script>getLogData();</script>
+	</body>
+</html>
