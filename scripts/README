@@ -1,0 +1,3 @@
+copy ldrattn to /etc/logrotate.d/
+copy ldrattnapp /etc/init.d/ 
+create a link S03ldr -> ../init.d/ldrattnapp under /etc/rc5.d/
