@@ -24,18 +24,17 @@
 #define MAXBUF 256
 
 char *LDR_CONF = "/usr/local/etc/ldrattn/ldrattn.conf";
-LDRConf ldrconf;
 
 /*
  * initialize data to default values
  */
-void loadDefParams()
+void loadDefParams(LDRConf *ldrconf)
 {
-	ldrconf.volume = DEFAULT_VOLUME;	
-	ldrconf.impedance = DEFAULT_IMPEDANCE;	
-	ldrconf.calibSteps = DEFAULT_CALIB_STEPS;	
-	ldrconf.balanceChan = LEFTCHAN; //left
-	ldrconf.balanceValue = DEFAULT_BALANCE_VALUE_DB;
+	ldrconf->volume = DEFAULT_VOLUME;	
+	ldrconf->impedance = DEFAULT_IMPEDANCE;	
+	ldrconf->calibSteps = DEFAULT_CALIB_STEPS;	
+	ldrconf->balanceChan = LEFTCHAN; //left
+	ldrconf->balanceValue = DEFAULT_BALANCE_VALUE_DB;
 	
 }
 
@@ -79,7 +78,7 @@ void removespace (char * s)
  *   d) The client is responsible for validating whether the
  *      pararmeters are complete, or correct.
  */
-int readParseCfg()
+int readParseCfg(LDRConf *ldrconf)
 {
 	char *s, buff[MAXBUF];
 	struct stat st;
@@ -93,7 +92,7 @@ int readParseCfg()
 	stat(LDR_CONF,&st);
 
 	if(!st.st_size){
-		debugLog(LOG_INFO, "%s config is empty\n",LDR_CONF);
+		debugLog("%s config is empty\n",LDR_CONF);
 		
 		return EXIT_FAILURE;
 	}		
@@ -128,15 +127,15 @@ int readParseCfg()
 	
 		/* Copy into correct entry in parameters struct */
 		if (strcmp(name, "defVolume")==0)
-			ldrconf.volume = rvalue;
+			ldrconf->volume = rvalue;
 		else if (strcmp(name, "impedance")==0)
-			ldrconf.impedance = rvalue;
+			ldrconf->impedance = rvalue;
 		else if (strcmp(name, "calibSteps")==0)
-			ldrconf.calibSteps = rvalue;
+			ldrconf->calibSteps = rvalue;
 		else if (strcmp(name, "balance")==0)
-			ldrconf.balanceChan = rvalue;
+			ldrconf->balanceChan = rvalue;
 		else if (strcmp(name, "balValue")==0)
-			ldrconf.balanceValue = rvalue;
+			ldrconf->balanceValue = rvalue;
 		else
 			LOG_TRACE(LOG_INFO,"WARNING: %s/%d: Unknown name/value pair!\n", name, rvalue);
 		LOG_TRACE(LOG_INFO,"the read values %s : %d \n",name,rvalue);
