@@ -81,6 +81,7 @@ static void readLDRConfig()
 	getCSVFilename(ldrconf.impedance,csvfile);
 	//debugLog("the csvfile %s \n",csvfile);		 			
 
+	memset(&ldrattn,0,sizeof(ldrattn));
 	if(readCalibData(csvfile) == EXIT_SUCCESS) {
 		
 		printCalibData();
@@ -175,7 +176,35 @@ int getTemperature()
 
 	return 25;
 
-} 
+}
+
+static int sendSuccess(int sockfd)
+{
+	char respbuf[MAXLEN];
+	memset(respbuf,'\0',MAXLEN);
+	strcpy(respbuf,"Sucess");
+
+	send(sockfd,respbuf,strlen(respbuf),0);		 			
+}
+
+static int sendFailure(int sockfd)
+{
+	char respbuf[MAXLEN];
+	memset(respbuf,'\0',MAXLEN);
+	strcpy(respbuf,"Failure");
+	send(sockfd,respbuf,strlen(respbuf),0);		 			
+
+}
+
+static int sendCustom(int sockfd)
+{
+	char respbuf[MAXLEN];
+	memset(respbuf,'\0',MAXLEN);
+	snprintf(respbuf,MAXLEN,"%d,%d,%d,%d,%d",calibdata.impedance,calibdata.numsteps,calibdata.status,calibdata.sestep,calibdata.shstep);
+	send(sockfd,respbuf,strlen(respbuf),0);		 			
+
+}
+
 static int cmdParser(char *clientcmd,int sockfd)
 {
 	unsigned int argvalue;	
@@ -241,7 +270,6 @@ static int cmdParser(char *clientcmd,int sockfd)
 		}
 		//set volume
 	} else if(!strncmp(argc[argcnt],"RELOAD_CONFIG",strlen(argc[argcnt]))) {
-		memset(&ldrattn,0,sizeof(ldrattn));
 		stopCorrectionThread();
 		setMute();
 		readLDRConfig();
@@ -251,17 +279,19 @@ static int cmdParser(char *clientcmd,int sockfd)
 	} else if(!strncmp(argc[argcnt],"CALIB_SAVE",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		if(saveCalibration() == EXIT_FAILURE) {
 			debugLog("Failed to Save Calibrated Data \n");
+			sendFailure(sockfd);		 			
 		} else {  
 			memset(&calibdata,0,sizeof(calibdata));
+			sendSuccess(sockfd);
 		}		 
 		//save calibration
 
 	} else if(!strncmp(argc[argcnt],"WRITE_CONFIG",strlen(argc[argcnt]))) {
 		//write to config file
-		writeLDRConfig(argc);
 		stopCorrectionThread();
+		writeLDRConfig(argc);
 		readLDRConfig();
-		State = NOTCALIBRATED;	
+		sendSuccess(sockfd);
 
 	} else if(!strncmp(argc[argcnt],"BALANCE_UPDATE",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		attr.balanceChan = atoi(argc[++argcnt]);
@@ -281,10 +311,7 @@ static int cmdParser(char *clientcmd,int sockfd)
 		 
 	} else if(!strncmp(argc[argcnt],"CALIB_STATUS",strlen(argc[argcnt]))) {
 		LOG_TRACE(LOG_INFO,"Calib Status from client\n");
-		snprintf(respbuf,MAXLEN,"%d,%d,%d,%d,%d",calibdata.impedance,calibdata.numsteps,calibdata.status,calibdata.sestep,calibdata.shstep);
-		LOG_TRACE(LOG_INFO,"calibstatus is %s\n",respbuf);
-		//debugLog("calibstatus is %s\n",respbuf);
-		send(sockfd,respbuf,strlen(respbuf),0);		 			
+		sendCustom(sockfd);		 			
 		 
 	} else if(!strncmp(argc[argcnt],"INC_VOLUME",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		stopCorrectionThread();

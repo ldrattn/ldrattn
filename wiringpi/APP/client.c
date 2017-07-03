@@ -230,7 +230,7 @@ int main(int argc,char *argv[])
 	
 	printf("Request: %s \n",cmd);
 	send(s,cmd,MAXLEN,0);	
-	if(command == CALIB_STATUS) {
+	if((command == CALIB_STATUS) || (command == CALIB_SAVE ) || (command == WRITE_CONFIG)) {
 		memset(cmd,'\0',MAXLEN);
 		recv(s,cmd,MAXLEN,0);
 		printf("Response: %s \n",cmd);
