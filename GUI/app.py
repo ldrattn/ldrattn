@@ -19,6 +19,8 @@ def main():
 
 @app.route("/dashboard", methods=['GET', 'POST'])
 def dashBoard():
+	respdata = {}
+	#respdata['res'] = "success" 
 	if request.method == 'GET':
 		pot = request.args.get('PVALUE')
 		data = daccess.get_dashboard_data() 
@@ -26,11 +28,13 @@ def dashBoard():
 			data = daccess.update_calib_info(pot, data) 
 			data['impedance'] = pot
 	if request.method == 'POST':
-		action.save_dashboard_data(request)
-		action.reload_ldr()
-		data = daccess.get_dashboard_data() 
+		respdata['res'] = action.save_dashboard_data(request)
+		#respdata['res'] = "success" 
+		#action.reload_ldr()
+		data = daccess.get_dashboard_data()
 	potactive = daccess.get_active_pot_file()
-	return render_template('dashboard.html', ldrdata=data, potactive=potactive)
+
+	return render_template('dashboard.html', ldrdata=data, potactive=potactive, respdata=respdata)
 
 @app.route("/calibration", methods=['GET', 'POST'])
 def calibration():

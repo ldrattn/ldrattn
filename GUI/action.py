@@ -22,12 +22,16 @@ def save_dashboard_data(request):
 
 	command = "client -W -i %s -t %s -c %d -b %d -v %d" % (impedance, temp_comp, balance, balValue, defVolume)
 	print command
+	response = "Response: Sucess"
 
 	p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	for line in p.stdout.readlines():
 	    print line,
+	    if(re.match("Response:", line)):
+			response = line.rstrip("\n\r")
 	retval = p.wait()
-	return 0;
+	#return 0;
+	return response
 
 
 def reload_ldr():
@@ -59,6 +63,7 @@ def calibration_status(pot):
 	command = "client -P"
 	print command
 	response = "No response"
+
 	p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	for line in p.stdout.readlines():
 	    	print line,

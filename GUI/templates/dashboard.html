@@ -30,7 +30,8 @@
 			var pot_list = '{{ ldrdata['potlist'] }}';
 			var pot_activefile = '{{ potactive }}' ;
 			var pot_array = [ "{{ potactive[0]|safe}}", "{{ potactive[1]|safe}}", "{{ potactive[2]|safe}}", "{{ potactive[3]|safe}}", "{{ potactive[4]|safe}}"]; 
-			//alert(pot_array);
+			var respp = '{{ respdata['res']|safe }}';
+			//alert(respp);
 			
 			$sub(document).ready(function () {
 				
@@ -49,14 +50,32 @@
 				} else if ($sub.inArray("80", pot_array) == -1) {
 					document.getElementById("imp80").style.display = "none";
 				}
-
-				refreshPage();
+				document.getElementById("Umsg").innerHTML = " ";			
+				responseCheck();	
+				//refreshPage();
+				
 				initValidation();			
 			});
 			
 			function initValidation() {
-					$sub("#TEMP").attr("data-validation-engine","validate[required,custom[onlyNumberSp]]");
-					$sub("#homeconfig").validationEngine('attach', {promptPosition : "bottomRight"});
+				$sub("#TEMP").attr("data-validation-engine","validate[required,custom[onlyNumberSp]]");
+				$sub("#homeconfig").validationEngine('attach', {promptPosition : "bottomRight"});
+			}
+
+
+			function responseCheck() {
+				res = 1;
+				if( respp == "Response: Sucess " ) {
+					document.getElementById("Umsg").style.color = "green";
+                    			document.getElementById("Umsg").innerHTML = "Successfully Updated";
+					setTimeout ( "refreshPage(res)", 5000 );
+                		} else if (respp == "Response: Sucess") {
+                    			document.getElementById("Umsg").innerHTML = "Update Failed!!" ;
+					setTimeout ( "refreshPage(res)", 5000 );
+				} else {
+					document.getElementById("Umsg").innerHTML = "";
+                		}
+                		//setTimeout ( "refreshPage(res)", 5000 );
 			}
 
 			function submitData() {
@@ -71,11 +90,11 @@
 
 					formObj.submit_action.value = "1";
 					formObj.submit();
+	
 				}
 			}
-			
-			function refreshPage() {
-				var ref = '<?php echo $ref ?>';
+	
+			function refreshPage(ref) {
 				if(ref == "1") {
 					parent.refreshFrame();
 				}
@@ -94,7 +113,7 @@
 	</head>
 	<body onclick="javascript: parent.hideMenu()">
 		<div class="content">
-			<h1>Home<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(0)" /></h1>
+			<h1>Home<img src="../static/images/icn_help.png" style="margin-left: 10px; cursor: pointer" onclick="parent.helpPage(0)" />&nbsp; <span id="Umsg" style="font-size:13px; color:red;">&nbsp;</span></h1>
 			<div id="sipstatusbody" style="height: ; overflow-y: hidden; width: 95%; overflow-x: hidden">
 				<div id="page-content">
 					<div class="clear"></div>
@@ -107,7 +126,7 @@
 						<form id="homeconfig" method="post" action="" autocomplete="off" onsubmit="return false">
 						<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
 							<tbody>
-								<tr style="background-color:#f3f3f3" height="5"><td></td></tr>
+							<!--	<tr style="background-color:#f3f3f3" height="5"><td></td></tr>
 								<tr style="background-color:#f3f3f3">
 									<td>
 										<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
@@ -124,7 +143,7 @@
 											</tr>
 										</table>
 									</td>
-								</tr>
+								</tr>-->
 								<tr style="background-color:#fff">
 									<td>
 										<table width="100%" border="0" cellspacing="0" cellpadding="0" class="yui">
