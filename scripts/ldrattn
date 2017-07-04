@@ -1,0 +1,12 @@
+/var/log/ldrattnapp.log{
+  daily 
+  rotate 5
+  size 100M
+  compress
+  missingok
+  postrotate
+     touch /var/log/ldrattnapp.log	
+     service ldrattnapp restart 
+  endscript
+}
+

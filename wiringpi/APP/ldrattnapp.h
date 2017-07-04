@@ -28,7 +28,7 @@ typedef struct {
 	LDRdata dataL[VOL_MAX_STEP - 2];
 	LDRdata dataR[VOL_MAX_STEP - 2];
 	LDRtargetres targetres[VOL_MAX_STEP - 2];
-	unsigned short ldrTemp;      //
+	unsigned short ldrTemp;      
 	unsigned short potImpedence;
 	unsigned short calibSteps;
 }LDRAttr;
@@ -68,7 +68,7 @@ typedef struct {
 	unsigned int deltaTemp; 
 }LDRConf;
  
-extern LDRConf ldrconf; 
+//extern LDRConf ldrconf; 
 extern unsigned int calibStop;
 extern unsigned int deltaStop;
 
@@ -80,7 +80,6 @@ extern unsigned int deltaStop;
 int readCalibData(char *); 
 void setVolume(int );
 //int doCalibration(unsigned int ,int ,int ); 
-void loadDefparams(void);
-int readParseCfg(void);
+//void loadDefparams(void);
 
 #endif 

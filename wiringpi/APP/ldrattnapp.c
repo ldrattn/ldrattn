@@ -20,7 +20,7 @@ static void printCalibData();
 static void readLDRConfig();
 static int cmdParser(char *clientcmd,int sockfd);
 static void startCalibrationThread(unsigned int ,unsigned int,unsigned int);
-static void stopCorrectionThread(void);
+static void stopCalibrationThread(void);
 static void startCorrectionThread(void);
 static void stopCorrectionThread(void);
 
@@ -69,17 +69,19 @@ static void readLDRConfig()
 {
 	char csvfile[MAXLEN];
 
-	loadDefParams();		
-	if(readParseCfg() != EXIT_SUCCESS){
-		debugLog(LOG_INFO, "Failed to Read Config file,so loading default values\n");
+	loadDefParams(&ldrconf);		
+	if(readParseCfg(&ldrconf) != EXIT_SUCCESS){
+		debugLog( "Failed to Read Config file,so loading default values\n");
 	}
-	LOG_TRACE(LOG_INFO,"the config values %d %d %d\n",ldrconf.volume,ldrconf.impedance,ldrconf.calibSteps);		 			
+	LOG_TRACE(LOG_INFO,"the config values %d %d \n",ldrconf.volume,ldrconf.impedance); 	
+	debugLog("the config values %d %d \n",ldrconf.volume,ldrconf.impedance);		 	
 	curVolume = ldrconf.volume;
 	curImpedance = ldrconf.impedance;
-
 	memset(csvfile,'\0',MAXLEN);
 	getCSVFilename(ldrconf.impedance,csvfile);
+	//debugLog("the csvfile %s \n",csvfile);		 			
 
+	memset(&ldrattn,0,sizeof(ldrattn));
 	if(readCalibData(csvfile) == EXIT_SUCCESS) {
 		
 		printCalibData();
@@ -87,11 +89,14 @@ static void readLDRConfig()
 		startCorrectionThread();		
 		State = CALIBRATED;
 		LOG_TRACE(LOG_INFO,"Read Calibrated Data \n");		 			
+		debugLog("Read Calibrated Data \n");		 			
+		calibLog("Read Calibrated Data \n");		 			
 	} else {
 		LOG_TRACE(LOG_INFO,"Failed to Read Calibrated Data Maybe calibrration not done\n");
 		//we are check for file size null. csv format cheking should be done on GUI side while
 		//uploading .
-		debugLog(LOG_INFO, "Failed to Read Calibrated Data Maybe calibrration not done\n");
+		calibLog("Failed to Read Calibrated Data Maybe calibrration not done\n");
+		debugLog("Failed to Read Calibrated Data Maybe calibrration not done\n");
 		setMute();
 		State = NOTCALIBRATED;
 	}
@@ -106,13 +111,16 @@ static void startCorrectionThread()
 		ret  = pthread_create(&deltaThread,NULL,(void *)deltaCorrection,(void *)&attr);
 		if(ret == 0){
 			LOG_TRACE(LOG_INFO,"Created Delta correction thread\n");
+			debugLog("Created Delta correction thread\n");
 			crnState = CRN_ONGOING; 
 		} else {
 			LOG_TRACE(LOG_INFO,"Failed to Create Delta correction thread\n");
+			debugLog("Failed to Create Delta correction thread\n");
 			//todo what to do if it fails to create the thread
 		}
 	} else {
 		LOG_TRACE(LOG_INFO,"Delta correction thread already running\n");
+		debugLog("Delta correction thread already running\n");
 
 	}	
 }
@@ -134,9 +142,11 @@ static void startCalibrationThread(unsigned int impedance,unsigned int numsteps,
 
 	if(ret == 0) {
 		LOG_TRACE(LOG_INFO,"Calibrartion thread created\n");
+		debugLog("Calibrartion thread created\n");
 
 	} else {
 		LOG_TRACE(LOG_INFO,"Failed  to create the calibration thread \n");
+		debugLog("Failed  to create the calibration thread \n");
 		calibdata.status = CALIB_FAILED;
 		//todo what to do if it fails to create the thread
 	}
@@ -144,36 +154,20 @@ static void startCalibrationThread(unsigned int impedance,unsigned int numsteps,
 
 static void stopCorrectionThread()
 {
-#if 0
-	int ret;
-
-	ret = pthread_cancel(deltaThread);
- 	if(ret) {
-		LOG_TRACE(LOG_INFO,"Failed to Cancel Delta correction thread %d\n",ret);
-
-	}
-#endif
-
 	deltaStop = TRUE;
 	pthread_join(deltaThread,NULL);
 	crnState = CRN_NONE; 
-	printf("stopCorrectionThread ---  \n");		
+	LOG_TRACE(LOG_INFO,"stopCorrectionThread ---  \n");		
+	debugLog("stopCorrectionThread ---  \n");		
 }
 
 static void stopCalibrationThread()
 {
-#if 0
-	int ret;
-
-	ret = pthread_cancel(calibThread);
- 	if(ret) {
-		LOG_TRACE(LOG_INFO,"Failed to Cancel Calibration thread %d\n",ret);
-	}
-#endif
 
 	calibStop = TRUE;
 	pthread_join(calibThread,NULL);	
-	printf("stopCalibrationThread ---  \n");		
+	LOG_TRACE(LOG_INFO,"stopCalibrationThread ---  \n");		
+	debugLog("stopCalibrationThread ---  \n");		
 
 }
 
@@ -182,7 +176,35 @@ int getTemperature()
 
 	return 25;
 
-} 
+}
+
+static int sendSuccess(int sockfd)
+{
+	char respbuf[MAXLEN];
+	memset(respbuf,'\0',MAXLEN);
+	strcpy(respbuf,"Sucess");
+
+	send(sockfd,respbuf,strlen(respbuf),0);		 			
+}
+
+static int sendFailure(int sockfd)
+{
+	char respbuf[MAXLEN];
+	memset(respbuf,'\0',MAXLEN);
+	strcpy(respbuf,"Failure");
+	send(sockfd,respbuf,strlen(respbuf),0);		 			
+
+}
+
+static int sendCustom(int sockfd)
+{
+	char respbuf[MAXLEN];
+	memset(respbuf,'\0',MAXLEN);
+	snprintf(respbuf,MAXLEN,"%d,%d,%d,%d,%d",calibdata.impedance,calibdata.numsteps,calibdata.status,calibdata.sestep,calibdata.shstep);
+	send(sockfd,respbuf,strlen(respbuf),0);		 			
+
+}
+
 static int cmdParser(char *clientcmd,int sockfd)
 {
 	unsigned int argvalue;	
@@ -202,6 +224,7 @@ static int cmdParser(char *clientcmd,int sockfd)
 	}
 
 	argcnt = 0;
+	printf("the calibration state is %d\n",State);
 	if(!strncmp(argc[argcnt],"CALIB_START",strlen(argc[argcnt]))) { 
 	
 		if((calibdata.status == CALIB_ONGOING)) {
@@ -215,16 +238,13 @@ static int cmdParser(char *clientcmd,int sockfd)
 			impedance = atoi(argc[++argcnt]);
 			calibsteps = atoi(argc[++argcnt]);
 			temperature = getTemperature(); 
-#if 0
-			ldrconf.calibSteps = calibsteps;
-#endif
-			printf("----------------- impedance %d\n",impedance);
+			LOG_TRACE(LOG_INFO,"----------------- impedance %d\n",impedance);
 			//Todo de we need to set the volume to default volume or current volume after calibration 			
 			if(calibsteps <= CALIB_MAXSTEP) {	
 				startCalibrationThread(impedance,calibsteps,temperature);
 			} else {
 				LOG_TRACE(LOG_INFO,"Calibrartion step exceeded Maximum limit \n");
-				debugLog(LOG_INFO, "Calibrartion step exceeded Maximum limit \n");
+				debugLog("Calibrartion step exceeded Maximum limit \n");
 
 			}
 		}
@@ -234,7 +254,8 @@ static int cmdParser(char *clientcmd,int sockfd)
 		memset(&calibdata,0,sizeof(calibdata));
 		stopCalibrationThread();
 		startCorrectionThread();
-		printf("cALIBRATION STOPPED ------------------\n");	
+		LOG_TRACE(LOG_INFO,"cALIBRATION STOPPED ------------------\n");	
+		debugLog("cALIBRATION STOPPED ------------------\n");	
 	
 	} else if(!strncmp(argc[argcnt],"SET_VOLUME",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		stopCorrectionThread();
@@ -243,12 +264,12 @@ static int cmdParser(char *clientcmd,int sockfd)
 		attr.balanceValue = 0;
 		setVolume(argvalue);
 		curVolume = argvalue;
-		if((curVolume != 0) &&  (curVolume < (ldrconf.calibSteps - 1))) {
+		printf(" setting the volume ----------- %d %d \n",curVolume,ldrattn.calibSteps);
+		if((curVolume != 0) &&  (curVolume < (ldrattn.calibSteps))) {
 			startCorrectionThread();		
 		}
 		//set volume
 	} else if(!strncmp(argc[argcnt],"RELOAD_CONFIG",strlen(argc[argcnt]))) {
-		memset(&ldrattn,0,sizeof(ldrattn));
 		stopCorrectionThread();
 		setMute();
 		readLDRConfig();
@@ -256,19 +277,21 @@ static int cmdParser(char *clientcmd,int sockfd)
 		//reload config
 
 	} else if(!strncmp(argc[argcnt],"CALIB_SAVE",strlen(argc[argcnt])) && (State == CALIBRATED)) {
-		if(saveCalibration(calibdata.impedance,calibdata.numsteps,calibdata.temperature) == EXIT_FAILURE) {
-			debugLog(LOG_INFO, "Failed to Save Calibrated Data \n");
+		if(saveCalibration() == EXIT_FAILURE) {
+			debugLog("Failed to Save Calibrated Data \n");
+			sendFailure(sockfd);		 			
 		} else {  
 			memset(&calibdata,0,sizeof(calibdata));
+			sendSuccess(sockfd);
 		}		 
 		//save calibration
 
 	} else if(!strncmp(argc[argcnt],"WRITE_CONFIG",strlen(argc[argcnt]))) {
 		//write to config file
-		writeLDRConfig(argc);
 		stopCorrectionThread();
+		writeLDRConfig(argc);
 		readLDRConfig();
-		State = NOTCALIBRATED;	
+		sendSuccess(sockfd);
 
 	} else if(!strncmp(argc[argcnt],"BALANCE_UPDATE",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		attr.balanceChan = atoi(argc[++argcnt]);
@@ -288,18 +311,16 @@ static int cmdParser(char *clientcmd,int sockfd)
 		 
 	} else if(!strncmp(argc[argcnt],"CALIB_STATUS",strlen(argc[argcnt]))) {
 		LOG_TRACE(LOG_INFO,"Calib Status from client\n");
-		snprintf(respbuf,MAXLEN,"%d,%d,%d,%d,%d",calibdata.impedance,calibdata.numsteps,calibdata.status,calibdata.sestep,calibdata.shstep);
-		printf("calibstatus is %s\n",respbuf);
-		send(sockfd,respbuf,strlen(respbuf),0);		 			
+		sendCustom(sockfd);		 			
 		 
 	} else if(!strncmp(argc[argcnt],"INC_VOLUME",strlen(argc[argcnt])) && (State == CALIBRATED)) {
 		stopCorrectionThread();
 		attr.balanceChan = 0;
 		attr.balanceValue = 0;
-		if(curVolume < (ldrconf.calibSteps - 1)) {
+		if(curVolume < ldrattn.calibSteps) {
 			setVolume(++curVolume);
 		}
-		if((curVolume > 0) &&  (curVolume < (ldrconf.calibSteps - 1))) {
+		if((curVolume > 0) &&  (curVolume < ldrattn.calibSteps)) {
 			startCorrectionThread();		
 		}
 	} else if(!strncmp(argc[argcnt],"DEC_VOLUME",strlen(argc[argcnt])) && (State == CALIBRATED)) {
@@ -309,12 +330,13 @@ static int cmdParser(char *clientcmd,int sockfd)
 		if(curVolume > 0) {
 			setVolume(--curVolume);
 		}	
-		if((curVolume > 0) &&  (curVolume < (ldrconf.calibSteps - 1))) {
+		if((curVolume > 0) &&  (curVolume < ldrattn.calibSteps )) {
 			startCorrectionThread();		
 		}
 	 
 	} else {
-		LOG_TRACE(LOG_INFO,"  Invalid command received from clieint\n");		 			
+		LOG_TRACE(LOG_INFO,"  Invalid command received from clieint\n"); 			
+		debugLog("Invalid command received from clieint\n");		 			
 	}
 	
 	return EXIT_SUCCESS;
@@ -334,15 +356,17 @@ int main()
 
 	State = NOTCALIBRATED;
 
-	openLog();	
+//	openLog();	
 	
 	crnState = CRN_NONE;	
 	if(initWiringPiDevices() != EXIT_SUCCESS){
 		LOG_TRACE(LOG_INFO,"  Failed to initialise the I2C transaction \n");
+		debugLog("  Failed to initialise the I2C transaction \n");
 		exit(1);
 	}
 	if(!testSetup()) {
 		LOG_TRACE(LOG_INFO,"  Failed to initialise the ADC/DAC  transaction \n");
+		debugLog("  Failed to initialise the ADC/DAC  transaction \n");
 		exit(1);
 
 	}
@@ -350,6 +374,7 @@ int main()
 	
 	if(pipe(pipefd) < 0) {
 		LOG_TRACE(LOG_INFO,"  Failed to create pipe fd for IPC \n");
+		debugLog("  Failed to create pipe fd for IPC \n");
 		exit(1);		
 	}
 			
@@ -395,14 +420,17 @@ int main()
 				exit(1);
 			}	
 			recv(ldrSock, cmd, 80, 0);
-			printf("the command received is %s \n",cmd);
+			LOG_TRACE(LOG_INFO,"the command received is %s \n",cmd);
+			//debugLog("the command received is %s \n",cmd);
 			cmdParser(cmd,ldrSock);
-			printf("Completed. %s\n",cmd);
+			LOG_TRACE(LOG_INFO,"Completed. %s\n",cmd);
+			//debugLog("Completed. %s\n",cmd);
 			close(ldrSock);
 		} 
 		if(FD_ISSET(pipefd[0],&readfds)) {
 			read(pipefd[0],&ipcdata,1);
-			printf("starting correction thread \n");
+			LOG_TRACE(LOG_INFO,"starting correction thread \n");
+			debugLog("starting correction thread \n");
 			startCorrectionThread();		
 		} 
 		

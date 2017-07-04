@@ -21,17 +21,15 @@ unsigned int db;
 unsigned int flag;
 
 LDRAttr ldrattn;
-LDRConf ldrconf;
 
 
 void getCSVFilename(unsigned int impedance,char *csvfile)
 {
 	char filename[MAXLEN];
 	const char *csvpath = "/usr/local/etc/ldrattn/csv/";
-	
-	memset(filename,'\0',MAXLEN);		
-	sprintf(filename,"%s%dk.csv",csvpath,impedance);			
-
+	memset(filename,'\0',MAXLEN);
+	sprintf(filename,"%s%dk.csv",csvpath,impedance);
+	printf(" the imepdance %d\n",impedance);	
 	strcpy(csvfile,filename);	
 	LOG_TRACE(LOG_INFO,"the csvfile %s\n",csvfile);		 			
 }
@@ -156,14 +154,16 @@ int readCalibData(char *Fname)
 	struct stat st;
 
 	if(!strlen(Fname)) {
-		printf("Filename is Null\n");
+		LOG_TRACE(LOG_INFO,"Filename is Null\n");
+		debugLog("Filename is Null\n");
 		return EXIT_FAILURE;
 	}
 
 	stat(Fname,&st);
 
 	if(!st.st_size){
-		printf("%s csv file is empty\n",Fname);
+		LOG_TRACE(LOG_INFO,"%s csv file is empty\n",Fname);
+		debugLog("%s csv file is empty\n",Fname);
 		return EXIT_FAILURE;
 	}		
 
@@ -171,14 +171,16 @@ int readCalibData(char *Fname)
 
 	infile = fopen(Fname, "rb");
 	if (infile == NULL) {
-		printf("Failed to open the file %s\n",Fname);
+		LOG_TRACE(LOG_INFO,"Failed to open the file %s\n",Fname);
+		debugLog("Failed to open the file %s\n",Fname);
 		return EXIT_FAILURE;
 	}
 	flag = 0;
 	count = 0; db=0;
 	while ((Nbytes = fread(buf, 1, MAX_BUF_LEN, infile)) > 0) {
 		if (csv_parse(&p, buf, Nbytes, callback1, NULL, NULL) != Nbytes) {
-			printf("Error parsing file: %s\n", csv_strerror(csv_error(&p)));
+			LOG_TRACE(LOG_INFO,"Error parsing file: %s\n", csv_strerror(csv_error(&p)));
+			debugLog("Error parsing file: %s\n", csv_strerror(csv_error(&p)));
 			fclose(infile);
 			return EXIT_FAILURE;
 		}
@@ -193,7 +195,7 @@ int readCalibData(char *Fname)
 } 
 
 
-int writeCalibData(char *Fname,unsigned int steps,unsigned int temperature,LDRAttr ldrattn_t)
+int writeCalibData(char *Fname,LDRAttr ldrattn_t)
 {
 	struct csv_parser p;
 	FILE *outfile;
@@ -209,13 +211,16 @@ int writeCalibData(char *Fname,unsigned int steps,unsigned int temperature,LDRAt
 
 	outfile = fopen(Fname, "wb");
 	if (outfile == NULL) {
-		printf("Failed to open the file %s\n",Fname);
+		LOG_TRACE(LOG_INFO,"Failed to open the file %s\n",Fname);
+		debugLog("Failed to open the file %s\n",Fname);
 		return EXIT_FAILURE;
 	}
 	
-	sprintf(buf,"%d,%d,%d,\n",ldrattn_t.potImpedence,steps,temperature);
+	sprintf(buf,"%d,%d,%d,\n",ldrattn_t.potImpedence,ldrattn_t.calibSteps,ldrattn_t.ldrTemp);
+	LOG_TRACE(LOG_INFO,"the impedance is %d %d %d and buf %s\n",ldrattn_t.potImpedence,ldrattn_t.ldrTemp,ldrattn_t.calibSteps,buf);	
+	debugLog("the impedance is %d %d %d and buf %s\n",ldrattn_t.potImpedence,ldrattn_t.ldrTemp,ldrattn_t.calibSteps,buf);	
 	csv_fwrite(outfile,buf,strlen(buf));	
-	for(i =0 ;i <= steps;i++) {
+	for(i =0 ;i <= ldrattn_t.calibSteps;i++) {
 		sprintf(buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\n",ldrattn_t.dataR[i].pw_SE,ldrattn_t.dataR[i].pw_SH,ldrattn_t.dataR[i].i_SE,ldrattn_t.dataR[i].i_SH,ldrattn_t.dataL[i].pw_SE,ldrattn_t.dataL[i].pw_SH,ldrattn_t.dataL[i].i_SE,ldrattn_t.dataL[i].i_SH,ldrattn_t.targetres[i].series,ldrattn_t.targetres[i].shunt);	
 		csv_fwrite(outfile,buf,strlen(buf));	
 	}

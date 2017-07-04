@@ -3,6 +3,6 @@
 
 void getCSVFilename(unsigned int,char *);
 int readCalibData(char *Fname); 
-int writeCalibData(char *Fname,unsigned int steps,unsigned int temperature,LDRAttr ldrattn_t);
+int writeCalibData(char *Fname,LDRAttr ldrattn_t);
 
 #endif
